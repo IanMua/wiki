@@ -1,7 +1,7 @@
 package com.ianmu.wiki.controller;
 
-import com.ianmu.wiki.entity.Test;
-import com.ianmu.wiki.service.TestService;
+import com.ianmu.wiki.entity.Ebook;
+import com.ianmu.wiki.service.EbookService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +12,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-public class TestController {
+@RequestMapping("ebook")
+public class EbookController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TestController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EbookController.class);
 
     @Autowired
-    private TestService testService;
+    private EbookService ebookService;
 
     @RequestMapping(value = "/hello", method = RequestMethod.GET)
     public String hello() {
@@ -25,8 +26,8 @@ public class TestController {
     }
 
     @RequestMapping(value = "/helloM", method = RequestMethod.GET)
-    public List<Test> helloM() {
-        List<Test> list = testService.list();
+    public List<Ebook> helloM() {
+        List<Ebook> list = ebookService.list();
         LOG.info("返回结果:\t", list);
         return list;
     }
