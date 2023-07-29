@@ -1,2 +1,8 @@
 server:
   port: 8088
+spring:
+  datasource:
+    url: jdbc:mysql://rm-uf67phjjf1svyi19m3o.mysql.rds.aliyuncs.com/wiki?characterEncoding=UTF8&autoReconnect=true&serverTimezone=Asia/Shanghai
+    username: root
+    password: Ianmu0810
+    driver-class-name: com.mysql.cj.jdbc.Driver
