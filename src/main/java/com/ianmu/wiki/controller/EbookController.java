@@ -1,6 +1,7 @@
 package com.ianmu.wiki.controller;
 
 import com.ianmu.wiki.entity.Ebook;
+import com.ianmu.wiki.resp.CommonResp;
 import com.ianmu.wiki.service.EbookService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,15 +21,11 @@ public class EbookController {
     @Autowired
     private EbookService ebookService;
 
-    @RequestMapping(value = "/hello", method = RequestMethod.GET)
-    public String hello() {
-        return "Hello World!";
-    }
-
-    @RequestMapping(value = "/helloM", method = RequestMethod.GET)
-    public List<Ebook> helloM() {
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public CommonResp list() {
+        CommonResp<List<Ebook>> resp = new CommonResp<>();
         List<Ebook> list = ebookService.list();
-        LOG.info("返回结果:\t", list);
-        return list;
+        resp.setContent(list);
+        return resp;
     }
 }
