@@ -95,18 +95,18 @@ defineComponent({
   name: 'HomeView',
 });
 
-let actions = [
+const actions = [
   {
-    type: 'StarOutlined',
+    icon: 'StarOutlined',
     text: '156'
   },
   {
-    type: 'LikeOutlined',
-    test: '156'
+    icon: 'LikeOutlined',
+    text: '156'
   },
   {
-    type: 'MessageOutlined',
-    test: '2'
+    icon: 'MessageOutlined',
+    text: '2'
   }
 ];
 
