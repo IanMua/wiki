@@ -48,7 +48,8 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
-      <a-list item-layout="vertical" size="default" :pagination="pagination" :data-source="ebooks" :grid="{ gutter: 20, column: 3 }" :loading="loading">
+      <a-list item-layout="vertical" size="default" :data-source="ebooks" :grid="{ gutter: 20, column: 3 }"
+              :loading="loading">
         <template #renderItem="{ item }">
           <a-list-item key="item.name">
             <template #actions>
@@ -99,18 +100,22 @@ const actions = [
 let ebooks: any = ref([]);
 let loading = true;
 
-const pagination = {
-  onChange: (page: number) => {
-    console.log(page);
-  },
-  pageSize: 3,
-};
-
 onMounted(() => {
-  axios.get("http://127.0.0.1:8088/ebook/list?name=py").then(res => {
+  axios.get("http://127.0.0.1:8088/ebook/list").then(res => {
     ebooks.value = res.data.content;
     loading = false;
   })
 })
 
 </script>
+
+<style scoped>
+
+.ant-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 8%;
+  margin: 5px 0;
+}
+
+</style>
