@@ -48,37 +48,23 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
-      <a-list item-layout="vertical" size="default" :pagination="pagination" :data-source="ebooks">
-        <template #footer>
-          <div>
-            <b>ant design vue</b>
-            footer part
-          </div>
-        </template>
+      <a-list item-layout="vertical" size="default" :pagination="pagination" :data-source="ebooks" :grid="{ gutter: 20, column: 3 }" :loading="loading">
         <template #renderItem="{ item }">
-          <a-list-item key="item.title">
+          <a-list-item key="item.name">
             <template #actions>
-          <span v-for="{ icon, text } in actions" :key="icon">
-            <component :is="icon" style="margin-right: 8px"/>
-            {{ text }}
-          </span>
-            </template>
-            <template #extra>
-              <img
-                  width="272"
-                  alt="logo"
-                  src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
-              />
+            <span v-for="{ icon, text } in actions" :key="icon">
+              <component :is="icon" style="margin-right: 8px"/>
+              {{ text }}
+            </span>
             </template>
             <a-list-item-meta :description="item.description">
               <template #title>
-                <a :href="item.href">{{ item.title }}</a>
+                <a :href="item.href">{{ item.name }}</a>
               </template>
               <template #avatar>
-                <a-avatar :src="item.avatar"/>
+                <a-avatar :src="item.cover"/>
               </template>
             </a-list-item-meta>
-            {{ item.content }}
           </a-list-item>
         </template>
       </a-list>
@@ -111,18 +97,7 @@ const actions = [
 ];
 
 let ebooks: any = ref([]);
-
-for (let i = 0; i < 23; i++) {
-  ebooks.value.push({
-    href: 'https://www.antdv.com/',
-    title: `ant design vue part ${i}`,
-    avatar: 'https://joeschmoe.io/api/v1/random',
-    description:
-        'Ant Design, a design language for background applications, is refined by Ant UED Team.',
-    content:
-        'We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their product prototypes beautifully and efficiently.',
-  });
-}
+let loading = true;
 
 const pagination = {
   onChange: (page: number) => {
@@ -131,14 +106,11 @@ const pagination = {
   pageSize: 3,
 };
 
-// onMounted(() => {
-//   axios.get("http://127.0.0.1:8088/ebook/list?name=py").then(res => {
-//     console.log(res);
-//     ebooks = ref({
-//       ...res.data.content
-//     })
-//     console.log(ebooks);
-//   })
-// })
+onMounted(() => {
+  axios.get("http://127.0.0.1:8088/ebook/list?name=py").then(res => {
+    ebooks.value = res.data.content;
+    loading = false;
+  })
+})
 
 </script>
