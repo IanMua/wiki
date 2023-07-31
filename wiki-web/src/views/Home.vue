@@ -101,7 +101,7 @@ let ebooks: any = ref([]);
 let loading = true;
 
 onMounted(() => {
-  axios.get(process.env.VUE_APP_SERVER + "/ebook/list").then(res => {
+  axios.get("/ebook/list").then(res => {
     ebooks.value = res.data.content;
     loading = false;
   })
