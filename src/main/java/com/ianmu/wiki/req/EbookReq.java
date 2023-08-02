@@ -1,9 +1,11 @@
 package com.ianmu.wiki.req;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class EbookReq {
+public class EbookReq extends PageReq {
     private Integer id;
 
     private String name;

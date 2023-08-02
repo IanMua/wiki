@@ -1,9 +1,11 @@
 package com.ianmu.wiki.resp;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class EbookResp {
+public class EbookResp extends PageResp {
     private Integer id;
 
     private String name;
