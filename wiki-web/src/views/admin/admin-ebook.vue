@@ -89,11 +89,14 @@ const columns = [
  * @param params
  */
 const handleQuery = (params: any) => {
-  axios.get("/ebook/list", params).then(res => {
+  axios.get("/ebook/list", {
+    params
+  }).then(res => {
     loading.value = false;
-    ebooks.value = res.data.content;
+    ebooks.value = res.data.content.list;
 
     pagination.value.current = params.page;
+    pagination.value.total = res.data.content.list;
   })
 }
 
@@ -111,7 +114,10 @@ const handleTableChange = (pagination: any) => {
 }
 
 onMounted(() => {
-  handleQuery({});
+  handleQuery({
+    page: 1,
+    size: pagination.value.pageSize
+  });
 })
 
 </script>
