@@ -2,8 +2,6 @@
   <a-layout>
     <a-layout-sider width="200" style="background: #fff">
       <a-menu
-          v-model:selectedKeys="selectedKeys2"
-          v-model:openKeys="openKeys"
           mode="inline"
           :style="{ height: '100%', borderRight: 0 }"
       >
@@ -102,7 +100,7 @@ let loading = true;
 
 onMounted(() => {
   axios.get("/ebook/list").then(res => {
-    ebooks.value = res.data.content;
+    ebooks.value = res.data.content.list;
     loading = false;
   })
 })
