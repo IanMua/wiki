@@ -16,7 +16,7 @@
         </template>
         <template v-slot:action="{ text, record }">
           <a-space size="small">
-            <a-button type="primary" @click="edit">
+            <a-button type="primary" @click="edit(record)">
               编辑
             </a-button>
             <a-button type="primary" danger>
@@ -28,7 +28,50 @@
     </a-layout-content>
   </a-layout>
   <a-modal v-model:open="formOpen" title="电子书表单" :confirm-loading="formLoading" @ok="handleFormOk">
-    <p>表单</p>
+    <a-form
+        :model="ebook"
+        name="basic"
+        :label-col="{ span: 4 }"
+        :wrapper-col="{ span: 16 }"
+    >
+      <a-form-item
+          label="封面"
+          name="cover"
+      >
+        <a-input v-model:value="ebook.cover" />
+      </a-form-item>
+
+      <a-form-item
+          label="名称"
+          name="name"
+          :rules="[{ required: true, message: '请输入书名' }]"
+      >
+        <a-input v-model:value="ebook.name" />
+      </a-form-item>
+
+      <a-form-item
+          label="分类一"
+          name="category1Id"
+          :rules="[{ required: true, message: '请输入分类一' }]"
+      >
+        <a-input v-model:value="ebook.category1Id" />
+      </a-form-item>
+
+      <a-form-item
+          label="分类二"
+          name="category2Id"
+          :rules="[{ required: true, message: '请输入分类二' }]"
+      >
+        <a-input v-model:value="ebook.category2Id" />
+      </a-form-item>
+
+      <a-form-item
+          label="描述"
+          name="description"
+      >
+        <a-input v-model:value="ebook.description" />
+      </a-form-item>
+    </a-form>
   </a-modal>
 </template>
 
@@ -87,6 +130,7 @@ const columns = [
 /**
  * 表单
  */
+const ebook: any = ref([]);
 const formOpen = ref(false);
 const formLoading = ref(false);
 const handleFormOk = () => {
@@ -100,8 +144,9 @@ const handleFormOk = () => {
 /**
  * 编辑
  */
-const edit = () => {
+const edit = (record: any) => {
   formOpen.value = true;
+  ebook.value = record;
 }
 
 /**
