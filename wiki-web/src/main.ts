@@ -26,7 +26,7 @@ axios.interceptors.response.use(function (response) {
     return Promise.reject(error);
 });
 
-const app: any = createApp(App)
+const app = createApp(App)
 app.use(store).use(router).use(antd).mount('#app');
 
 //全局图标

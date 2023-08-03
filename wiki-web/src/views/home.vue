@@ -73,7 +73,7 @@
 
 <script setup lang="ts">
 
-import {defineComponent, onMounted, reactive, ref} from 'vue';
+import {defineComponent, onMounted, ref} from 'vue';
 import axios from "axios";
 
 defineComponent({

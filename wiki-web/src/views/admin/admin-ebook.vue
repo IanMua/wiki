@@ -16,7 +16,7 @@
         </template>
         <template v-slot:action="{ text, record }">
           <a-space size="small">
-            <a-button type="primary">
+            <a-button type="primary" @click="edit">
               编辑
             </a-button>
             <a-button type="primary" danger>
@@ -27,7 +27,12 @@
       </a-table>
     </a-layout-content>
   </a-layout>
+  <a-modal v-model:open="formOpen" title="电子书表单" :confirm-loading="formLoading" @ok="handleFormOk">
+    <p>表单</p>
+  </a-modal>
 </template>
+
+
 <script setup lang="ts">
 
 import {defineComponent, onMounted, ref} from "vue";
@@ -38,11 +43,7 @@ defineComponent({
 })
 
 const ebooks = ref();
-const pagination = ref({
-  current: 1,
-  pageSize: 10,
-  total: 0
-});
+
 const loading = ref(true);
 
 const columns = [
@@ -84,11 +85,31 @@ const columns = [
 ];
 
 /**
+ * 表单
+ */
+const formOpen = ref(false);
+const formLoading = ref(false);
+const handleFormOk = () => {
+  formLoading.value = true;
+  setTimeout(()=>{
+    formOpen.value = false;
+    formLoading.value = false
+  },2000)
+}
+
+/**
+ * 编辑
+ */
+const edit = () => {
+  formOpen.value = true;
+}
+
+/**
  * 查询请求
  *
  * @param params
  */
-const handleQuery = (params: any) => {
+const handleQuery = (params: { page: number; size: number; }) => {
   axios.get("/ebook/list", {
     params
   }).then(res => {
@@ -101,11 +122,16 @@ const handleQuery = (params: any) => {
 }
 
 /**
- * 换页
+ * 分页
  *
  * @param pagination
  */
-const handleTableChange = (pagination: any) => {
+const pagination = ref({
+  current: 1,
+  pageSize: 10,
+  total: 0
+});
+const handleTableChange = (pagination: {current: number, pageSize: number}) => {
   console.log("自带分页参数 : " + pagination);
   handleQuery({
     page: pagination.current,
