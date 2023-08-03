@@ -21,6 +21,15 @@ public class EbookService {
     @Autowired
     private EbookMapper ebookMapper;
 
+    public List<EbookResp> all(EbookReq req) {
+        EbookExample ebookExample = new EbookExample();
+        EbookExample.Criteria criteria = ebookExample.createCriteria();
+        List<Ebook> ebookList = ebookMapper.selectByExample(ebookExample);
+        List<EbookResp> ebookRespList = CopyUtil.copyList(ebookList, EbookResp.class);
+
+        return ebookRespList;
+    }
+
     public PageResp<EbookResp> list(EbookReq req) {
         EbookExample ebookExample = new EbookExample();
         EbookExample.Criteria criteria = ebookExample.createCriteria();

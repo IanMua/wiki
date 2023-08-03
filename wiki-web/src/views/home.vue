@@ -99,8 +99,8 @@ let ebooks: any = ref([]);
 let loading = true;
 
 onMounted(() => {
-  axios.get("/ebook/list").then(res => {
-    ebooks.value = res.data.content.list;
+  axios.get("/ebook/all").then(res => {
+    ebooks.value = res.data.content;
     loading = false;
   })
 })
