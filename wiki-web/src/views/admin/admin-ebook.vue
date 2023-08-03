@@ -38,7 +38,7 @@
           label="封面"
           name="cover"
       >
-        <a-input v-model:value="ebook.cover" />
+        <a-input v-model:value="ebook.cover"/>
       </a-form-item>
 
       <a-form-item
@@ -46,7 +46,7 @@
           name="name"
           :rules="[{ required: true, message: '请输入书名' }]"
       >
-        <a-input v-model:value="ebook.name" />
+        <a-input v-model:value="ebook.name"/>
       </a-form-item>
 
       <a-form-item
@@ -54,7 +54,7 @@
           name="category1Id"
           :rules="[{ required: true, message: '请输入分类一' }]"
       >
-        <a-input v-model:value="ebook.category1Id" />
+        <a-input v-model:value="ebook.category1Id"/>
       </a-form-item>
 
       <a-form-item
@@ -62,14 +62,14 @@
           name="category2Id"
           :rules="[{ required: true, message: '请输入分类二' }]"
       >
-        <a-input v-model:value="ebook.category2Id" />
+        <a-input v-model:value="ebook.category2Id"/>
       </a-form-item>
 
       <a-form-item
           label="描述"
           name="description"
       >
-        <a-input v-model:value="ebook.description" />
+        <a-input v-model:value="ebook.description"/>
       </a-form-item>
     </a-form>
   </a-modal>
@@ -135,10 +135,19 @@ const formOpen = ref(false);
 const formLoading = ref(false);
 const handleFormOk = () => {
   formLoading.value = true;
-  setTimeout(()=>{
-    formOpen.value = false;
-    formLoading.value = false
-  },2000)
+  axios.post("/ebook/save", {
+    ...ebook.value
+  }).then(res => {
+    if (res.data.success) {
+      formLoading.value = false;
+      formOpen.value = false;
+
+      handleQuery({
+        page: pagination.value.current,
+        size: pagination.value.pageSize
+      });
+    }
+  })
 }
 
 /**
@@ -176,7 +185,7 @@ const pagination = ref({
   pageSize: 10,
   total: 0
 });
-const handleTableChange = (pagination: {current: number, pageSize: number}) => {
+const handleTableChange = (pagination: { current: number, pageSize: number }) => {
   console.log("自带分页参数 : " + pagination);
   handleQuery({
     page: pagination.current,

@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class EbookReq extends PageReq {
+public class EbookQueryReq extends PageReq {
     private Integer id;
 
     private String name;

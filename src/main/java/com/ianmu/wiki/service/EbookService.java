@@ -5,8 +5,10 @@ import com.github.pagehelper.PageInfo;
 import com.ianmu.wiki.entity.Ebook;
 import com.ianmu.wiki.entity.EbookExample;
 import com.ianmu.wiki.mapper.EbookMapper;
-import com.ianmu.wiki.req.EbookReq;
-import com.ianmu.wiki.resp.EbookResp;
+import com.ianmu.wiki.req.EbookQueryReq;
+import com.ianmu.wiki.req.EbookSaveReq;
+import com.ianmu.wiki.resp.CommonResp;
+import com.ianmu.wiki.resp.EbookQueryResp;
 import com.ianmu.wiki.resp.PageResp;
 import com.ianmu.wiki.utils.CopyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,16 +23,15 @@ public class EbookService {
     @Autowired
     private EbookMapper ebookMapper;
 
-    public List<EbookResp> all(EbookReq req) {
+    public List<EbookQueryResp> all(EbookQueryReq req) {
         EbookExample ebookExample = new EbookExample();
         EbookExample.Criteria criteria = ebookExample.createCriteria();
         List<Ebook> ebookList = ebookMapper.selectByExample(ebookExample);
-        List<EbookResp> ebookRespList = CopyUtil.copyList(ebookList, EbookResp.class);
 
-        return ebookRespList;
+        return CopyUtil.copyList(ebookList, EbookQueryResp.class);
     }
 
-    public PageResp<EbookResp> list(EbookReq req) {
+    public PageResp<EbookQueryResp> list(EbookQueryReq req) {
         EbookExample ebookExample = new EbookExample();
         EbookExample.Criteria criteria = ebookExample.createCriteria();
         if (!ObjectUtils.isEmpty(req.getName())) {
@@ -41,12 +42,22 @@ public class EbookService {
         }
         List<Ebook> ebookList = ebookMapper.selectByExample(ebookExample);
         PageInfo<Ebook> pageInfo = new PageInfo<>(ebookList);
-        List<EbookResp> ebookRespList = CopyUtil.copyList(ebookList, EbookResp.class);
+        List<EbookQueryResp> ebookQueryRespList = CopyUtil.copyList(ebookList, EbookQueryResp.class);
 
-        PageResp<EbookResp> pageResp = new PageResp<>();
+        PageResp<EbookQueryResp> pageResp = new PageResp<>();
         pageResp.setTotal(pageInfo.getTotal());
-        pageResp.setList(ebookRespList);
+        pageResp.setList(ebookQueryRespList);
 
         return pageResp;
+    }
+
+    public CommonResp save(EbookSaveReq req) {
+        CommonResp commonResp = new CommonResp();
+        if (ObjectUtils.isEmpty(req.getId())) {
+            ebookMapper.insert(CopyUtil.copy(req, Ebook.class));
+        } else {
+            ebookMapper.updateByPrimaryKey(CopyUtil.copy(req, Ebook.class));
+        }
+        return commonResp;
     }
 }
