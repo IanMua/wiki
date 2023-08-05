@@ -13,11 +13,14 @@
     "@ant-design/icons-vue": "^6.1.0",
     "ant-design-vue": "4.0",
     "axios": "^1.4.0",
+    "json-bigint": "^1.0.0",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3",
-    "vuex": "^4.0.0"
+    "vuex": "^4.0.0",
+    "yarn": "^1.22.19"
   },
   "devDependencies": {
+    "@types/json-bigint": "^1.0.1",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
     "@vue/cli-plugin-eslint": "~5.0.0",

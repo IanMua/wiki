@@ -1,13 +1,14 @@
 package com.ianmu.wiki.resp;
 
-import com.ianmu.wiki.req.PageReq;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
-public class EbookSaveResp extends PageReq {
-    private Integer id;
+public class EbookSaveResp {
+
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long id;
 
     private String name;
 

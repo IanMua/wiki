@@ -2,15 +2,16 @@ package com.ianmu.wiki.mapper;
 
 import com.ianmu.wiki.entity.Ebook;
 import com.ianmu.wiki.entity.EbookExample;
-import java.util.List;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface EbookMapper {
     long countByExample(EbookExample example);
 
     int deleteByExample(EbookExample example);
 
-    int deleteByPrimaryKey(Integer id);
+    int deleteByPrimaryKey(Long id);
 
     int insert(Ebook row);
 

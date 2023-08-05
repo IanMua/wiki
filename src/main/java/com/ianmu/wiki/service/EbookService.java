@@ -11,6 +11,7 @@ import com.ianmu.wiki.resp.CommonResp;
 import com.ianmu.wiki.resp.EbookQueryResp;
 import com.ianmu.wiki.resp.PageResp;
 import com.ianmu.wiki.utils.CopyUtil;
+import com.ianmu.wiki.utils.SnowFlow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -22,6 +23,9 @@ public class EbookService {
 
     @Autowired
     private EbookMapper ebookMapper;
+
+    @Autowired
+    private SnowFlow snowFlow;
 
     public List<EbookQueryResp> all(EbookQueryReq req) {
         EbookExample ebookExample = new EbookExample();
@@ -54,10 +58,15 @@ public class EbookService {
     public CommonResp save(EbookSaveReq req) {
         CommonResp commonResp = new CommonResp();
         if (ObjectUtils.isEmpty(req.getId())) {
+            req.setId(snowFlow.nextId());
             ebookMapper.insert(CopyUtil.copy(req, Ebook.class));
         } else {
             ebookMapper.updateByPrimaryKey(CopyUtil.copy(req, Ebook.class));
         }
         return commonResp;
+    }
+
+    public void delete(Long id) {
+        ebookMapper.deleteByPrimaryKey(id);
     }
 }

@@ -3,6 +3,11 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
+      <p>
+        <a-button type="primary" @click="add">
+          添加
+        </a-button>
+      </p>
       <a-table
           :columns="columns"
           :row-key="record => record.id"
@@ -11,18 +16,27 @@
           :loading="loading"
           @change="handleTableChange"
       >
-        <template #cover="{ text: cover }">
-          <img v-if="cover" :src="cover" alt="封面"/>
-        </template>
-        <template v-slot:action="{ text, record }">
-          <a-space size="small">
-            <a-button type="primary" @click="edit(record)">
-              编辑
-            </a-button>
-            <a-button type="primary" danger>
-              删除
-            </a-button>
-          </a-space>
+        <template #bodyCell="{ column, text, record }">
+          <template v-if="column.dataIndex === 'cover'">
+            <img :src="record.cover" alt="封面"/>
+          </template>
+          <template v-else-if="column.dataIndex === 'action'">
+            <a-space size="small">
+              <a-button type="primary" @click="edit(record)">
+                编辑
+              </a-button>
+              <a-popconfirm
+                  title="删除后不可恢复，确认删除?"
+                  ok-text="是"
+                  cancel-text="否"
+                  @confirm="handleDelete(record.id)"
+              >
+                <a-button type="primary" danger>
+                  删除
+                </a-button>
+              </a-popconfirm>
+            </a-space>
+          </template>
         </template>
       </a-table>
     </a-layout-content>
@@ -78,8 +92,10 @@
 
 <script setup lang="ts">
 
-import {defineComponent, onMounted, ref} from "vue";
+import {defineComponent, h, onMounted, ref} from "vue";
 import axios from "axios";
+import {notification, NotificationPlacement} from "ant-design-vue";
+import {CloseCircleFilled} from "@ant-design/icons-vue";
 
 defineComponent({
   name: "AdminEbook"
@@ -93,11 +109,10 @@ const columns = [
   {
     title: "封面",
     dataIndex: "cover",
-    slots: {customRender: "cover"}
   },
   {
     title: "名称",
-    dataIndex: "name",
+    dataIndex: "name"
   },
   {
     title: "分类一",
@@ -122,8 +137,7 @@ const columns = [
   },
   {
     title: "操作",
-    dataIndex: "action",
-    slots: {customRender: "action"}
+    dataIndex: "action"
   }
 ];
 
@@ -146,6 +160,8 @@ const handleFormOk = () => {
         page: pagination.value.current,
         size: pagination.value.pageSize
       });
+    }else {
+      formLoading.value = false;
     }
   })
 }
@@ -159,30 +175,56 @@ const edit = (record: any) => {
 }
 
 /**
+ * 添加
+ */
+const add = () => {
+  formOpen.value = true;
+  ebook.value = {};
+}
+
+/**
+ * 删除
+ */
+const handleDelete = (id: number) => {
+  axios.delete(`/ebook/delete/${id}`).then(res => {
+    if (res.data.success) {
+      handleQuery({
+        page: pagination.value.current,
+        size: pagination.value.pageSize
+      });
+    }
+  });
+};
+
+/**
  * 查询请求
  *
  * @param params
  */
 const handleQuery = (params: { page: number; size: number; }) => {
+  loading.value = true;
   axios.get("/ebook/list", {
     params
   }).then(res => {
     loading.value = false;
+
+    if (!res.data.success) {
+      return;
+    }
+
     ebooks.value = res.data.content.list;
 
     pagination.value.current = params.page;
     pagination.value.total = res.data.content.list;
-  })
-}
+  });
+};
 
 /**
  * 分页
- *
- * @param pagination
  */
 const pagination = ref({
   current: 1,
-  pageSize: 10,
+  pageSize: 1000,
   total: 0
 });
 const handleTableChange = (pagination: { current: number, pageSize: number }) => {
@@ -198,6 +240,6 @@ onMounted(() => {
     page: 1,
     size: pagination.value.pageSize
   });
-})
+});
 
 </script>

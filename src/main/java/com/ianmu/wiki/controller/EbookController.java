@@ -6,6 +6,7 @@ import com.ianmu.wiki.resp.CommonResp;
 import com.ianmu.wiki.resp.EbookQueryResp;
 import com.ianmu.wiki.resp.PageResp;
 import com.ianmu.wiki.service.EbookService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ public class EbookController {
 
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public CommonResp<PageResp<EbookQueryResp>> list(@ModelAttribute EbookQueryReq req) {
+    public CommonResp<PageResp<EbookQueryResp>> list(@Valid @ModelAttribute EbookQueryReq req) {
         CommonResp<PageResp<EbookQueryResp>> resp = new CommonResp<>();
         PageResp<EbookQueryResp> list = ebookService.list(req);
         resp.setContent(list);
@@ -40,7 +41,13 @@ public class EbookController {
     }
 
     @RequestMapping(value = "/save", method = RequestMethod.POST)
-    public CommonResp save(@RequestBody EbookSaveReq req) {
+    public CommonResp save(@Valid @RequestBody EbookSaveReq req) {
         return ebookService.save(req);
+    }
+
+    @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
+    public CommonResp delete(@PathVariable Long id) {
+        ebookService.delete(id);
+        return new CommonResp();
     }
 }

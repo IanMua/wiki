@@ -1,5 +1,8 @@
 package com.ianmu.wiki.utils;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class SnowFlow {
     //因为二进制里第一个 bit 为如果是 1，那么都是负数，但是我们生成的 id 都是正数，所以第一个 bit 统一都是 0。
 
