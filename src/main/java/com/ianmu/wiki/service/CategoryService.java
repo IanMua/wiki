@@ -27,9 +27,13 @@ public class CategoryService {
     @Autowired
     private SnowFlow snowFlow;
 
-    public List<CategoryQueryResp> all() {
+    public List<CategoryQueryResp> all(CategoryQueryReq req) {
         CategoryExample categoryExample = new CategoryExample();
         categoryExample.setOrderByClause("sort asc");
+        CategoryExample.Criteria criteria = categoryExample.createCriteria();
+        if (!ObjectUtils.isEmpty(req.getName())) {
+            criteria.andNameLike("%" + req.getName() + "%");
+        }
         List<Category> categoryList = categoryMapper.selectByExample(categoryExample);
 
         return CopyUtil.copyList(categoryList, CategoryQueryResp.class);
