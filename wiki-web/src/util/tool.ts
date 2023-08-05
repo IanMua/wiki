@@ -28,4 +28,28 @@ export class Tool {
             return JSON.parse(JSON.stringify(obj));
         }
     }
+
+    /**
+     * 使用递归将数组转为树形结构
+     * 父ID属性为parent
+     */
+    public static array2Tree(array: any, parentId: number) {
+        if (Tool.isEmpty(array)) {
+            return [];
+        }
+
+        const result = [];
+        for (let i = 0; i < array.length; i++) {
+            const c = array[i];
+            if (Number(c.parent) === Number(parentId)) {
+                result.push(c);
+
+                const children = Tool.array2Tree(array, c.id);
+                if (Tool.isNotEmpty(children)) {
+                    c.children = children;
+                }
+            }
+        }
+        return result;
+    }
 }

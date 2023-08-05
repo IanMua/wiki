@@ -27,7 +27,7 @@
       <a-table
           :columns="columns"
           :row-key="record => record.id"
-          :data-source="categorys"
+          :data-source="level1"
           :loading="loading"
           :pagination="false"
       >
@@ -204,6 +204,8 @@ const searching = ref(false);
 //   })
 // }
 
+const level1 = ref();
+
 /**
  * 查询请求
  */
@@ -218,6 +220,8 @@ const handleQuery = () => {
       }
 
       categorys.value = res.data.content;
+
+      level1.value = Tool.array2Tree(categorys.value, 0);
 
       resolve(res);
     })
