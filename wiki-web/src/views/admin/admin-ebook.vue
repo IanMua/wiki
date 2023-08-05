@@ -3,11 +3,27 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
-      <p>
-        <a-button type="primary" @click="add">
-          添加
-        </a-button>
-      </p>
+      <div style="margin-bottom: 10px">
+        <a-space>
+          <a-input-search v-model:value="searchBookName"
+                          allow-clear
+                          :loading="searching"
+                          enter-button
+                          placeholder="电子书名称"
+                          @search="handleSearchBookName"
+          >
+            <template #prefix>
+              <book-two-tone/>
+            </template>
+            <template #enter-button>
+
+            </template>
+          </a-input-search>
+          <a-button type="primary" @click="add">
+            添加
+          </a-button>
+        </a-space>
+      </div>
       <a-table
           :columns="columns"
           :row-key="record => record.id"
@@ -96,6 +112,7 @@ import {defineComponent, h, onMounted, ref} from "vue";
 import axios from "axios";
 import {notification, NotificationPlacement} from "ant-design-vue";
 import {CloseCircleFilled} from "@ant-design/icons-vue";
+import {Tool} from "@/util/tool";
 
 defineComponent({
   name: "AdminEbook"
@@ -144,7 +161,7 @@ const columns = [
 /**
  * 表单
  */
-const ebook: any = ref([]);
+const ebook: any = ref();
 const formOpen = ref(false);
 const formLoading = ref(false);
 const handleFormOk = () => {
@@ -160,7 +177,7 @@ const handleFormOk = () => {
         page: pagination.value.current,
         size: pagination.value.pageSize
       });
-    }else {
+    } else {
       formLoading.value = false;
     }
   })
@@ -171,7 +188,7 @@ const handleFormOk = () => {
  */
 const edit = (record: any) => {
   formOpen.value = true;
-  ebook.value = record;
+  ebook.value = Tool.copy(record);
 }
 
 /**
@@ -197,27 +214,50 @@ const handleDelete = (id: number) => {
 };
 
 /**
+ * 书名搜索
+ */
+const searchBookName = ref("");
+const searching = ref(false);
+const handleSearchBookName = () => {
+  if (searching.value === true) {
+    return;
+  }
+  searching.value = true;
+  handleQuery({
+    page: 1,
+    size: pagination.value.pageSize,
+    name: searchBookName.value
+  }).then(() => {
+    searching.value = false;
+  })
+}
+
+/**
  * 查询请求
  *
  * @param params
  */
-const handleQuery = (params: { page: number; size: number; }) => {
-  loading.value = true;
-  axios.get("/ebook/list", {
-    params
-  }).then(res => {
-    loading.value = false;
+const handleQuery = (params: any) => {
+  return new Promise((resolve, reject) => {
+    loading.value = true;
+    axios.get("/ebook/list", {
+      params
+    }).then(res => {
+      loading.value = false;
 
-    if (!res.data.success) {
-      return;
-    }
+      if (!res.data.success) {
+        return;
+      }
 
-    ebooks.value = res.data.content.list;
+      ebooks.value = res.data.content.list;
 
-    pagination.value.current = params.page;
-    pagination.value.total = res.data.content.list;
-  });
-};
+      pagination.value.current = params.page;
+      pagination.value.total = res.data.content.list;
+
+      resolve(res);
+    })
+  })
+}
 
 /**
  * 分页
