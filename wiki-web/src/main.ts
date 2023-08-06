@@ -27,7 +27,12 @@ axios.interceptors.response.use(function (response: any) {
     return response;
 }, error => {
     console.log("返回错误 : ", error);
-    return Promise.reject(error);
+    if (error.code === "ERR_NETWORK") {
+        errorNotification("topRight", "网络错误", error.message);
+    } else {
+        errorNotification("topRight", "错误", error.message);
+    }
+    // return Promise.reject(error);
 });
 
 /**
