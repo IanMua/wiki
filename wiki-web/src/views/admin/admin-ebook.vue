@@ -80,19 +80,15 @@
       </a-form-item>
 
       <a-form-item
-          label="分类一"
-          name="category1Id"
-          :rules="[{ required: true, message: '请输入分类一' }]"
+          label="分类"
+          name="categories"
       >
-        <a-input v-model:value="ebook.category1Id"/>
-      </a-form-item>
-
-      <a-form-item
-          label="分类二"
-          name="category2Id"
-          :rules="[{ required: true, message: '请输入分类二' }]"
-      >
-        <a-input v-model:value="ebook.category2Id"/>
+        <a-cascader
+            v-model:value="categoryIds"
+            :field-names="{label: 'name', value: 'id', children: 'children'}"
+            :options="level1"
+            placeholder="请选择分类"
+        />
       </a-form-item>
 
       <a-form-item
@@ -164,7 +160,12 @@ const columns = [
 const ebook: any = ref();
 const formOpen = ref(false);
 const formLoading = ref(false);
+const categoryIds = ref();
 const handleFormOk = () => {
+
+  ebook.value.category1Id = categoryIds.value[0];
+  ebook.value.category2Id = categoryIds.value[1];
+
   formLoading.value = true;
   axios.post("/ebook/save", {
     ...ebook.value
@@ -189,6 +190,7 @@ const handleFormOk = () => {
 const edit = (record: any) => {
   formOpen.value = true;
   ebook.value = Tool.copy(record);
+  categoryIds.value = [ebook.value.category1Id.toString(), ebook.value.category2Id.toString()];
 }
 
 /**
@@ -259,6 +261,29 @@ const handleQuery = (params: any) => {
   })
 }
 
+const category = ref();
+const level1 = ref();
+const handleQueryAll = (params?: any) => {
+  return new Promise((resolve, reject) => {
+    loading.value = true;
+    axios.get("/category/all", {
+      params
+    }).then(res => {
+      loading.value = false;
+
+      if (!res.data.success) {
+        return;
+      }
+
+      const categorys = res.data.content;
+
+      level1.value = Tool.array2Tree(categorys, categorys[0].parent);
+
+      resolve(res);
+    })
+  })
+}
+
 /**
  * 分页
  */
@@ -280,6 +305,7 @@ onMounted(() => {
     page: 1,
     size: pagination.value.pageSize
   });
+  handleQueryAll();
 });
 
 </script>
