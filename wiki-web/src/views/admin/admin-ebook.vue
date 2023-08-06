@@ -53,6 +53,9 @@
               </a-popconfirm>
             </a-space>
           </template>
+          <template v-else-if="column.dataIndex === 'category'">
+            {{ getCategoryName(record.category1Id) }} / {{ getCategoryName(record.category2Id) }}
+          </template>
         </template>
       </a-table>
     </a-layout-content>
@@ -128,13 +131,9 @@ const columns = [
     dataIndex: "name"
   },
   {
-    title: "分类一",
-    key: "category1Id",
-    dataIndex: "category1Id",
-  },
-  {
-    title: "分类二",
-    dataIndex: "category2Id",
+    title: "分类",
+    key: "category",
+    dataIndex: "category",
   },
   {
     title: "文档数",
@@ -235,6 +234,18 @@ const handleSearchBookName = () => {
 }
 
 /**
+ * 查询分类名称
+ */
+const categoryName = ref();
+const getCategoryName = (categoryId: any) => {
+  for (let i = 0; i < (categories.value).length; i++) {
+    if (categories.value[i].id === categoryId.toString()) {
+      return categories.value[i].name;
+    }
+  }
+}
+
+/**
  * 查询请求
  *
  * @param params
@@ -246,6 +257,10 @@ const handleQuery = (params: any) => {
       params
     }).then(res => {
       loading.value = false;
+
+      if (res === undefined){
+        return;
+      }
 
       if (!res.data.success) {
         return;
@@ -263,6 +278,7 @@ const handleQuery = (params: any) => {
 
 const category = ref();
 const level1 = ref();
+const categories = ref();
 const handleQueryAll = (params?: any) => {
   return new Promise((resolve, reject) => {
     loading.value = true;
@@ -271,13 +287,17 @@ const handleQueryAll = (params?: any) => {
     }).then(res => {
       loading.value = false;
 
+      if (res === undefined){
+        return;
+      }
+
       if (!res.data.success) {
         return;
       }
 
-      const categorys = res.data.content;
+      categories.value = res.data.content;
 
-      level1.value = Tool.array2Tree(categorys, categorys[0].parent);
+      level1.value = Tool.array2Tree(categories.value, categories.value[0].parent);
 
       resolve(res);
     })
@@ -293,7 +313,6 @@ const pagination = ref({
   total: 0
 });
 const handleTableChange = (pagination: { current: number, pageSize: number }) => {
-  console.log("自带分页参数 : " + pagination);
   handleQuery({
     page: pagination.current,
     size: pagination.pageSize
