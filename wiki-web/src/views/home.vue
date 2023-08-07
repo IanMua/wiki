@@ -4,43 +4,25 @@
       <a-menu
           mode="inline"
           :style="{ height: '100%', borderRight: 0 }"
+          :items="items"
+          @click="handleClickMenu"
+          @openChange="onOpenChange"
       >
-        <a-sub-menu key="sub1">
-          <template #title>
-              <span>
-                <user-outlined/>
-                subnav 1
-              </span>
-          </template>
-          <a-menu-item key="1">option1</a-menu-item>
-          <a-menu-item key="2">option2</a-menu-item>
-          <a-menu-item key="3">option3</a-menu-item>
-          <a-menu-item key="4">option4</a-menu-item>
-        </a-sub-menu>
-        <a-sub-menu key="sub2">
-          <template #title>
-              <span>
-                <laptop-outlined/>
-                subnav 2
-              </span>
-          </template>
-          <a-menu-item key="5">option5</a-menu-item>
-          <a-menu-item key="6">option6</a-menu-item>
-          <a-menu-item key="7">option7</a-menu-item>
-          <a-menu-item key="8">option8</a-menu-item>
-        </a-sub-menu>
-        <a-sub-menu key="sub3">
-          <template #title>
-              <span>
-                <notification-outlined/>
-                subnav 3
-              </span>
-          </template>
-          <a-menu-item key="9">option9</a-menu-item>
-          <a-menu-item key="10">option10</a-menu-item>
-          <a-menu-item key="11">option11</a-menu-item>
-          <a-menu-item key="12">option12</a-menu-item>
-        </a-sub-menu>
+        <!--        <template v-for="item in level1" :key="item">-->
+        <!--          <a-sub-menu>-->
+        <!--            <template #title>-->
+        <!--              <span>-->
+        <!--                <user-outlined/>-->
+        <!--                {{ item.name }}-->
+        <!--              </span>-->
+        <!--            </template>-->
+        <!--            <template v-for="child in item.children" :key="child.name">-->
+        <!--              <a-menu-item>-->
+        <!--                {{ child.name }}-->
+        <!--              </a-menu-item>-->
+        <!--            </template>-->
+        <!--          </a-sub-menu>-->
+        <!--        </template>-->
       </a-menu>
     </a-layout-sider>
     <a-layout-content
@@ -73,8 +55,11 @@
 
 <script setup lang="ts">
 
-import {defineComponent, onMounted, ref} from 'vue';
+import {defineComponent, h, onMounted, ref, VueElement} from 'vue';
 import axios from "axios";
+import {Tool} from "@/util/tool";
+import {ItemType} from "ant-design-vue";
+import {MailOutlined} from "@ant-design/icons-vue";
 
 defineComponent({
   name: 'HomeView',
@@ -96,13 +81,118 @@ const actions = [
 ];
 
 let ebooks: any = ref([]);
-let loading = true;
+
+/**
+ * 菜单数据转换
+ */
+const items = ref([]);
+function getItem(
+    label: VueElement | string,
+    key: string,
+    icon?: any,
+    children?: any,
+    type?: 'group',
+): ItemType {
+  return {
+    key,
+    icon,
+    children,
+    label,
+    type,
+  } as ItemType;
+}
+
+const loading = ref(true);
+const categorys = ref();
+const level1 = ref();
+/**
+ * 查询全部的分类
+ * @param params
+ */
+const handleQueryCategory = (params?: any) => {
+  return new Promise((resolve, reject) => {
+    loading.value = true;
+    axios.get("/category/all", {
+      params
+    }).then(res => {
+      loading.value = false;
+
+      if (!res.data.success) {
+        return;
+      }
+
+      categorys.value = res.data.content;
+
+      level1.value = Tool.array2Tree(categorys.value, categorys.value[0].parent);
+
+      let t: any = [];
+      t.push(getItem("全部","0",() => h(MailOutlined)));
+      level1.value.forEach((res: any) => {
+        let arrays: ItemType[] = [];
+        res.children.forEach((i: any) => {
+          arrays.push(getItem(i.name, i.id));
+        })
+        t.push(getItem(res.name, res.id, () => h(MailOutlined), arrays));
+      })
+      items.value = t;
+
+      resolve(res);
+    });
+  });
+}
+
+/**
+ * 菜单查询请求
+ *
+ * @param param
+ */
+const handleClickMenu = (param: any) => {
+  if (param.keyPath[0] === "0") {
+    handleQueryEbookAll();
+    return;
+  }
+
+  const category1Id = param.keyPath[0];
+  const category2Id = param.keyPath[1];
+
+  handleQueryEbookAll({
+    category1Id,
+    category2Id
+  })
+  console.log(param)
+}
+
+/**
+ * 电子书查询请求
+ *
+ * @param params
+ */
+const handleQueryEbookAll = (params?: any) => {
+  return new Promise((resolve, reject) => {
+    loading.value = true;
+    axios.get("/ebook/all", {
+      params
+    }).then(res => {
+      loading.value = false;
+
+      if (res === undefined) {
+        return;
+      }
+
+      if (!res.data.success) {
+        return;
+      }
+
+      ebooks.value = res.data.content;
+
+      resolve(res);
+    })
+  })
+}
 
 onMounted(() => {
-  axios.get("/ebook/all").then(res => {
-    ebooks.value = res.data.content;
-    loading = false;
-  })
+  handleQueryEbookAll();
+  handleQueryCategory();
 })
 
 </script>

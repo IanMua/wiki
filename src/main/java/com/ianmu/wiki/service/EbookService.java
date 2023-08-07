@@ -30,6 +30,12 @@ public class EbookService {
     public List<EbookQueryResp> all(EbookQueryReq req) {
         EbookExample ebookExample = new EbookExample();
         EbookExample.Criteria criteria = ebookExample.createCriteria();
+        if (!ObjectUtils.isEmpty(req.getCategory1Id())) {
+            criteria.andCategory1IdEqualTo(req.getCategory1Id());
+        }
+        if (!ObjectUtils.isEmpty(req.getCategory2Id())) {
+            criteria.andCategory2IdEqualTo(req.getCategory2Id());
+        }
         List<Ebook> ebookList = ebookMapper.selectByExample(ebookExample);
 
         return CopyUtil.copyList(ebookList, EbookQueryResp.class);
