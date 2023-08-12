@@ -6,23 +6,7 @@
           :style="{ height: '100%', borderRight: 0 }"
           :items="items"
           @click="handleClickMenu"
-          @openChange="onOpenChange"
       >
-        <!--        <template v-for="item in level1" :key="item">-->
-        <!--          <a-sub-menu>-->
-        <!--            <template #title>-->
-        <!--              <span>-->
-        <!--                <user-outlined/>-->
-        <!--                {{ item.name }}-->
-        <!--              </span>-->
-        <!--            </template>-->
-        <!--            <template v-for="child in item.children" :key="child.name">-->
-        <!--              <a-menu-item>-->
-        <!--                {{ child.name }}-->
-        <!--              </a-menu-item>-->
-        <!--            </template>-->
-        <!--          </a-sub-menu>-->
-        <!--        </template>-->
       </a-menu>
     </a-layout-sider>
     <a-layout-content
@@ -40,7 +24,9 @@
             </template>
             <a-list-item-meta :description="item.description">
               <template #title>
-                <a :href="item.href">{{ item.name }}</a>
+                <router-link :to="'/doc?ebookId=' + item.id">
+                  {{ item.name }}
+                </router-link>
               </template>
               <template #avatar>
                 <a-avatar :src="item.cover"/>
@@ -86,6 +72,7 @@ let ebooks: any = ref([]);
  * 菜单数据转换
  */
 const items = ref([]);
+
 function getItem(
     label: VueElement | string,
     key: string,
@@ -126,7 +113,7 @@ const handleQueryCategory = (params?: any) => {
       level1.value = Tool.array2Tree(categorys.value, categorys.value[0].parent);
 
       let t: any = [];
-      t.push(getItem("全部","0",() => h(MailOutlined)));
+      t.push(getItem("全部", "0", () => h(MailOutlined)));
       level1.value.forEach((res: any) => {
         let arrays: ItemType[] = [];
         res.children.forEach((i: any) => {
