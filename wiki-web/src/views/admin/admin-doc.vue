@@ -9,7 +9,7 @@
                           allow-clear
                           :loading="searching"
                           enter-button
-                          placeholder="电子书名称"
+                          placeholder="文档名称"
                           @search="handleSearchBookName"
           >
             <template #prefix>
@@ -27,10 +27,9 @@
       <a-table
           :columns="columns"
           :row-key="record => record.id"
-          :data-source="ebooks"
-          :pagination="pagination"
+          :data-source="level1"
           :loading="loading"
-          @change="handleTableChange"
+          :pagination="false"
       >
         <template #bodyCell="{ column, text, record }">
           <template v-if="column.dataIndex === 'cover'">
@@ -41,11 +40,6 @@
               <a-button type="primary" @click="edit(record)">
                 编辑
               </a-button>
-              <router-link :to="'/admin/doc?ebookId='+record.id">
-                <a-button type="primary">
-                  文档管理
-                </a-button>
-              </router-link>
               <a-popconfirm
                   title="删除后不可恢复，确认删除?"
                   ok-text="是"
@@ -58,52 +52,51 @@
               </a-popconfirm>
             </a-space>
           </template>
-          <template v-else-if="column.dataIndex === 'category'">
-            {{ getCategoryName(record.category1Id) }} / {{ getCategoryName(record.category2Id) }}
-          </template>
         </template>
       </a-table>
     </a-layout-content>
   </a-layout>
-  <a-modal v-model:open="formOpen" title="电子书表单" :confirm-loading="formLoading" @ok="handleFormOk">
+  <a-modal v-model:open="formOpen" title="文档表单" :confirm-loading="formLoading" @ok="handleFormOk">
     <a-form
-        :model="ebook"
+        :model="doc"
         name="basic"
         :label-col="{ span: 4 }"
         :wrapper-col="{ span: 16 }"
     >
-      <a-form-item
-          label="封面"
-          name="cover"
-      >
-        <a-input v-model:value="ebook.cover"/>
-      </a-form-item>
 
       <a-form-item
           label="名称"
           name="name"
-          :rules="[{ required: true, message: '请输入书名' }]"
+          :rules="[{ required: true, message: '请输入文档名称' }]"
       >
-        <a-input v-model:value="ebook.name"/>
+        <a-input v-model:value="doc.name"/>
       </a-form-item>
 
       <a-form-item
-          label="分类"
-          name="categories"
+          label="父文档"
+          name="name"
+          :rules="[{ required: true, message: '请输入文档名称' }]"
       >
-        <a-cascader
-            v-model:value="categoryIds"
+        <a-tree-select
+            v-model:value="doc.parent"
+            show-search
+            style="width: 100%"
             :field-names="{label: 'name', value: 'id', children: 'children'}"
-            :options="level1"
-            placeholder="请选择分类"
+            :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
+            placeholder="请选择父文档"
+            allow-clear
+            tree-default-expand-all
+            :tree-data="treeSelectData"
+            tree-node-filter-prop="label"
         />
       </a-form-item>
 
       <a-form-item
-          label="描述"
-          name="description"
+          label="顺序"
+          name="sort"
+          :rules="[{ required: true, message: '请输入排序号' }]"
       >
-        <a-input v-model:value="ebook.description"/>
+        <a-input v-model:value="doc.sort"/>
       </a-form-item>
     </a-form>
   </a-modal>
@@ -117,40 +110,31 @@ import axios from "axios";
 import {notification, NotificationPlacement} from "ant-design-vue";
 import {CloseCircleFilled} from "@ant-design/icons-vue";
 import {Tool} from "@/util/tool";
+import {useRoute} from "vue-router";
 
 defineComponent({
-  name: "AdminEbook"
+  name: "AdminDoc"
 })
 
-const ebooks = ref();
+const route = useRoute();
+
+const docs = ref();
 
 const loading = ref(true);
 
 const columns = [
   {
-    title: "封面",
-    dataIndex: "cover",
-  },
-  {
     title: "名称",
     dataIndex: "name"
   },
   {
-    title: "分类",
-    key: "category",
-    dataIndex: "category",
+    title: "父文档",
+    key: "parent",
+    dataIndex: "parent",
   },
   {
-    title: "文档数",
-    dataIndex: "docCount",
-  },
-  {
-    title: "阅读数",
-    dataIndex: "viewCount",
-  },
-  {
-    title: "点赞数",
-    dataIndex: "voteCount",
+    title: "顺序",
+    dataIndex: "sort",
   },
   {
     title: "操作",
@@ -161,31 +145,39 @@ const columns = [
 /**
  * 表单
  */
-const ebook: any = ref();
+const doc: any = ref();
 const formOpen = ref(false);
 const formLoading = ref(false);
-const categoryIds = ref();
+const treeSelectData = ref();
 const handleFormOk = () => {
-
-  ebook.value.category1Id = categoryIds.value[0];
-  ebook.value.category2Id = categoryIds.value[1];
-
   formLoading.value = true;
-  axios.post("/ebook/save", {
-    ...ebook.value
+  axios.post("/doc/save", {
+    ...doc.value
   }).then(res => {
     if (res.data.success) {
       formLoading.value = false;
       formOpen.value = false;
 
-      handleQuery({
-        page: pagination.value.current,
-        size: pagination.value.pageSize
-      });
+      handleQuery();
     } else {
       formLoading.value = false;
     }
   })
+}
+const setDisable = (treeSelectData: any, id: any) => {
+  for (let i = 0; i < treeSelectData.length; i++) {
+    const node = treeSelectData[i];
+    if (node.id === id) {
+      node.disabled = true;
+
+      const children = node.children;
+      if (Tool.isNotEmpty(children)) {
+        for (let j = 0; j < children.length; j++) {
+          setDisable(children, children[j].id);
+        }
+      }
+    }
+  }
 }
 
 /**
@@ -193,8 +185,11 @@ const handleFormOk = () => {
  */
 const edit = (record: any) => {
   formOpen.value = true;
-  ebook.value = Tool.copy(record);
-  categoryIds.value = [ebook.value.category1Id.toString(), ebook.value.category2Id.toString()];
+  doc.value = Tool.copy(record);
+
+  treeSelectData.value = Tool.copy(level1.value);
+  setDisable(treeSelectData.value, record.id);
+  treeSelectData.value.unshift({id: 0, name: "无"});
 }
 
 /**
@@ -202,19 +197,21 @@ const edit = (record: any) => {
  */
 const add = () => {
   formOpen.value = true;
-  ebook.value = {};
+  doc.value = {
+    ebookId: route.query.ebookId
+  };
+
+  treeSelectData.value = Tool.copy(level1.value);
+  treeSelectData.value.unshift({id: 0, name: "无"});
 }
 
 /**
  * 删除
  */
 const handleDelete = (id: number) => {
-  axios.delete(`/ebook/delete/${id}`).then(res => {
+  axios.delete(`/doc/delete/${id}`).then(res => {
     if (res.data.success) {
-      handleQuery({
-        page: pagination.value.current,
-        size: pagination.value.pageSize
-      });
+      handleQuery();
     }
   });
 };
@@ -230,106 +227,40 @@ const handleSearchBookName = () => {
   }
   searching.value = true;
   handleQuery({
-    page: 1,
-    size: pagination.value.pageSize,
     name: searchBookName.value
   }).then(() => {
     searching.value = false;
   })
 }
 
-/**
- * 查询分类名称
- */
-const categoryName = ref();
-const getCategoryName = (categoryId: any) => {
-  for (let i = 0; i < (categories.value).length; i++) {
-    if (categories.value[i].id === categoryId.toString()) {
-      return categories.value[i].name;
-    }
-  }
-}
+const level1 = ref();
 
 /**
  * 查询请求
- *
- * @param params
  */
-const handleQuery = (params: any) => {
+const handleQuery = (params?: any) => {
   return new Promise((resolve, reject) => {
     loading.value = true;
-    axios.get("/ebook/list", {
+    axios.get("/doc/all", {
       params
     }).then(res => {
-
-      if (res === undefined) {
-        return;
-      }
+      loading.value = false;
 
       if (!res.data.success) {
         return;
       }
 
-      ebooks.value = res.data.content.list;
+      docs.value = res.data.content;
 
-      pagination.value.current = params.page;
-      pagination.value.total = res.data.content.list;
-
-      loading.value = false;
-      resolve(res);
-    })
-  })
-}
-
-const category = ref();
-const level1 = ref();
-const categories = ref();
-const handleQueryAll = (params?: any) => {
-  return new Promise((resolve, reject) => {
-    loading.value = true;
-    axios.get("/category/all", {
-      params
-    }).then(res => {
-      loading.value = false;
-
-      if (res === undefined) {
-        return;
-      }
-
-      if (!res.data.success) {
-        return;
-      }
-
-      categories.value = res.data.content;
-
-      level1.value = Tool.array2Tree(categories.value, categories.value[0].parent);
+      level1.value = Tool.array2Tree(docs.value, 0);
 
       resolve(res);
     })
   })
-}
-
-/**
- * 分页
- */
-const pagination = ref({
-  current: 1,
-  pageSize: 1000,
-  total: 0
-});
-const handleTableChange = (pagination: { current: number, pageSize: number }) => {
-  handleQuery({
-    page: pagination.current,
-    size: pagination.pageSize
-  });
 }
 
 onMounted(() => {
-  handleQuery({
-    page: 1,
-    size: pagination.value.pageSize
-  });
-  handleQueryAll();
+  handleQuery();
 });
 
 </script>

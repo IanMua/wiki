@@ -1,9 +1,9 @@
-package com.ianmu.wiki.entity;
+package com.ianmu.wiki.resp;
 
 import lombok.Data;
 
 @Data
-public class Doc {
+public class DocQueryResp {
     private Long id;
 
     private Long ebookId;
