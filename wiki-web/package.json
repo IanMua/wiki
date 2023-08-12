@@ -11,9 +11,11 @@
   },
   "dependencies": {
     "@ant-design/icons-vue": "^6.1.0",
+    "@tinymce/tinymce-vue": "^5.1.0",
     "ant-design-vue": "4.0",
     "axios": "^1.4.0",
     "json-bigint": "^1.0.0",
+    "tinymce": "^6.6.2",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3",
     "vuex": "^4.0.0",
