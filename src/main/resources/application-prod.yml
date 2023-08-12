@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:mysql://rm-uf67phjjf1svyi19m3o.mysql.rds.aliyuncs.com/wiki?characterEncoding=UTF8&autoReconnect=true&serverTimezone=Asia/Shanghai
-    username: wiki_prod
-    password: Wiki_prod
+    url: jdbc:mysql://121.36.221.156/wiki?characterEncoding=UTF8&autoReconnect=true&serverTimezone=Asia/Shanghai
+    username: wiki
+    password: U2FsdGVkX19SGJB8OEN6ZdaP
     driver-class-name: com.mysql.cj.jdbc.Driver
 server:
   port: 8088
