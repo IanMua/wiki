@@ -2,13 +2,15 @@ package com.ianmu.wiki.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.ianmu.wiki.entity.Content;
 import com.ianmu.wiki.entity.Doc;
 import com.ianmu.wiki.entity.DocExample;
+import com.ianmu.wiki.mapper.ContentMapper;
 import com.ianmu.wiki.mapper.DocMapper;
 import com.ianmu.wiki.req.DocQueryReq;
 import com.ianmu.wiki.req.DocSaveReq;
-import com.ianmu.wiki.resp.DocQueryResp;
 import com.ianmu.wiki.resp.CommonResp;
+import com.ianmu.wiki.resp.DocQueryResp;
 import com.ianmu.wiki.resp.PageResp;
 import com.ianmu.wiki.utils.CopyUtil;
 import com.ianmu.wiki.utils.SnowFlow;
@@ -23,6 +25,9 @@ public class DocService {
 
     @Autowired
     private DocMapper docMapper;
+
+    @Autowired
+    private ContentMapper contentMapper;
 
     @Autowired
     private SnowFlow snowFlow;
@@ -65,11 +70,20 @@ public class DocService {
 
     public CommonResp save(DocSaveReq req) {
         CommonResp commonResp = new CommonResp();
+        Doc doc = CopyUtil.copy(req, Doc.class);
+        Content content = CopyUtil.copy(req, Content.class);
         if (ObjectUtils.isEmpty(req.getId())) {
-            req.setId(snowFlow.nextId());
-            docMapper.insert(CopyUtil.copy(req, Doc.class));
+            doc.setId(snowFlow.nextId());
+            docMapper.insert(doc);
+
+            content.setId(doc.getId());
+            contentMapper.insert(content);
         } else {
             docMapper.updateByPrimaryKey(CopyUtil.copy(req, Doc.class));
+            int count = contentMapper.updateByPrimaryKeyWithBLOBs(content);
+            if (count == 0) {
+                contentMapper.insert(content);
+            }
         }
         return commonResp;
     }
@@ -83,5 +97,10 @@ public class DocService {
         DocExample.Criteria criteria = docExample.createCriteria();
         criteria.andIdIn(ids);
         docMapper.deleteByExample(docExample);
+    }
+
+    public String queryContent(Long id) {
+        Content content = contentMapper.selectByPrimaryKey(id);
+        return content == null ? "" : content.getContent();
     }
 }

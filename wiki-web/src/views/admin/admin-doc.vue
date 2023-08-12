@@ -56,57 +56,59 @@
       </a-table>
     </a-layout-content>
   </a-layout>
-  <a-modal v-model:open="formOpen" title="文档表单" :confirm-loading="formLoading" @ok="handleFormOk" :maskClosable="false" style="min-width: 50vw;">
-    <a-form
-        :model="doc"
-        name="basic"
-        :label-col="{ span: 4 }"
-        :wrapper-col="{ span: 16 }"
-    >
 
-      <a-form-item
-          label="名称"
-          name="name"
-          :rules="[{ required: true, message: '请输入文档名称' }]"
+  <a-modal v-model:open="formOpen" title="文档表单" :confirm-loading="formLoading" @ok="handleFormOk"
+           :maskClosable="false" style="min-width: 50vw;">
+      <a-form
+          :model="doc"
+          name="basic"
+          :label-col="{ span: 4 }"
+          :wrapper-col="{ span: 16 }"
       >
-        <a-input v-model:value="doc.name"/>
-      </a-form-item>
 
-      <a-form-item
-          label="父文档"
-          name="name"
-          :rules="[{ required: true, message: '请输入文档名称' }]"
-      >
-        <a-tree-select
-            v-model:value="doc.parent"
-            show-search
-            style="width: 100%"
-            :field-names="{label: 'name', value: 'id', children: 'children'}"
-            :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
-            placeholder="请选择父文档"
-            allow-clear
-            tree-default-expand-all
-            :tree-data="treeSelectData"
-            tree-node-filter-prop="label"
-        />
-      </a-form-item>
+        <a-form-item
+            label="名称"
+            name="name"
+            :rules="[{ required: true, message: '请输入文档名称' }]"
+        >
+          <a-input v-model:value="doc.name"/>
+        </a-form-item>
 
-      <a-form-item
-          label="顺序"
-          name="sort"
-          :rules="[{ required: true, message: '请输入排序号' }]"
-      >
-        <a-input v-model:value="doc.sort"/>
-      </a-form-item>
+        <a-form-item
+            label="父文档"
+            name="name"
+            :rules="[{ required: true, message: '请输入文档名称' }]"
+        >
+          <a-tree-select
+              v-model:value="doc.parent"
+              show-search
+              style="width: 100%"
+              :field-names="{label: 'name', value: 'id', children: 'children'}"
+              :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
+              placeholder="请选择父文档"
+              allow-clear
+              tree-default-expand-all
+              :tree-data="treeSelectData"
+              tree-node-filter-prop="label"
+          />
+        </a-form-item>
 
-      <a-form-item
-          label="内容"
-          name="content"
-          :rules="[{ required: true, message: '请输入内容' }]"
-      >
-        <Editor v-model="content" :api-key="apiKey" :init="init" />
-      </a-form-item>
-    </a-form>
+        <a-form-item
+            label="顺序"
+            name="sort"
+            :rules="[{ required: true, message: '请输入排序号' }]"
+        >
+          <a-input v-model:value="doc.sort"/>
+        </a-form-item>
+
+        <a-form-item
+            label="内容"
+            name="content"
+            :rules="[{ required: true, message: '请输入内容' }]"
+        >
+          <Editor v-model="content" :api-key="apiKey" :init="init"/>
+        </a-form-item>
+      </a-form>
   </a-modal>
 </template>
 
@@ -127,7 +129,7 @@ defineComponent({
 
 const route = useRoute();
 
-const docs = ref();
+const docs: any = ref();
 
 const loading = ref(true);
 
@@ -160,8 +162,9 @@ const formLoading = ref(false);
 const treeSelectData = ref();
 const handleFormOk = () => {
   formLoading.value = true;
+  doc.value.content = content.value;
   axios.post("/doc/save", {
-    ...doc.value
+    ...doc.value,
   }).then(res => {
     if (res.data.success) {
       formLoading.value = false;
@@ -211,7 +214,7 @@ const getDeleteIds = (treeSelectData: any, id: any) => {
 /**
  * 富文本初始化
  */
-const content = ref();
+const content: any = ref();
 const apiKey = ref("60t8v3pn12b662p8h2qrolgh0sr9jdmjkxctsdur4dgonm9o");
 const init = reactive({
   language: "zh_CN", //语言类型
@@ -232,12 +235,11 @@ const init = reactive({
   //工具栏配置，设为false则隐藏
   toolbar: [
     "fullscreen undo redo restoredraft | forecolor backcolor bold italic underline strikethrough link anchor | alignleft aligncenter alignright alignjustify outdent indent | bullist numlist | blockquote subscript superscript removeformat ",
-    "fontfamily fontsize styles | table image axupimgs media emoticons charmap hr pagebreak insertdatetime  selectall visualblocks searchreplace | code print preview | indent2em lineheight formatpainter "
+    "fontfamily fontsize styles | table image axupimgs media emoticons charmap hr pagebreak insertdatetime  selectall visualblocks searchreplace | code print preview | indent2em lineheight formatpainter"
   ],
   //菜单栏配置，设为false则隐藏，不配置则默认显示全部菜单，也可自定义配置--查看 http://tinymce.ax-z.cn/configure/editor-appearance.php --搜索“自定义菜单”
   // menubar: "file edit my1",
   // menubar: false,
-
 })
 
 
@@ -247,6 +249,9 @@ const init = reactive({
 const edit = (record: any) => {
   formOpen.value = true;
   doc.value = Tool.copy(record);
+  content.value = "";
+
+  handleQueryContent();
 
   treeSelectData.value = Tool.copy(level1.value);
   setDisable(treeSelectData.value, record.id);
@@ -261,6 +266,8 @@ const add = () => {
   doc.value = {
     ebookId: route.query.ebookId
   };
+
+  content.value = "";
 
   treeSelectData.value = Tool.copy(level1.value);
   treeSelectData.value.unshift({id: 0, name: "无"});
@@ -318,6 +325,26 @@ const handleQuery = (params?: any) => {
       docs.value = res.data.content;
 
       level1.value = Tool.array2Tree(docs.value, 0);
+
+      resolve(res);
+    })
+  })
+}
+
+/**
+ * 内容请求
+ */
+const handleQueryContent = () => {
+  return new Promise((resolve, reject) => {
+    loading.value = true;
+    axios.get("/doc/query-content/" + doc.value.id).then(res => {
+      loading.value = false;
+
+      if (!res.data.success) {
+        return;
+      }
+
+      content.value = res.data.content;
 
       resolve(res);
     })

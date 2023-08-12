@@ -22,4 +22,6 @@ public class DocQueryResp {
     private Integer viewCount;
 
     private Integer voteCount;
+
+    private String content;
 }

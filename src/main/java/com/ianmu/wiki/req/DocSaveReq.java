@@ -22,4 +22,7 @@ public class DocSaveReq {
     private Integer viewCount;
 
     private Integer voteCount;
+
+    @NotNull(message = "内容不能为空")
+    private String content;
 }

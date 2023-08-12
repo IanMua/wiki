@@ -58,4 +58,12 @@ public class DocController {
         docService.delete(ids);
         return new CommonResp();
     }
+
+    @RequestMapping(value = "/query-content/{id}", method = RequestMethod.GET)
+    public CommonResp<String> queryContent(@PathVariable Long id) {
+        CommonResp<String> resp = new CommonResp<>();
+        String content = docService.queryContent(id);
+        resp.setContent(content);
+        return resp;
+    }
 }
