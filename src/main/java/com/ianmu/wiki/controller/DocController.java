@@ -2,8 +2,8 @@ package com.ianmu.wiki.controller;
 
 import com.ianmu.wiki.req.DocQueryReq;
 import com.ianmu.wiki.req.DocSaveReq;
-import com.ianmu.wiki.resp.DocQueryResp;
 import com.ianmu.wiki.resp.CommonResp;
+import com.ianmu.wiki.resp.DocQueryResp;
 import com.ianmu.wiki.resp.PageResp;
 import com.ianmu.wiki.service.DocService;
 import jakarta.validation.Valid;
@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -46,8 +48,14 @@ public class DocController {
     }
 
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
-    public CommonResp delete(@PathVariable Long id) {
-        docService.delete(id);
+    public CommonResp delete(@PathVariable String id) {
+        List<Long> ids = new ArrayList<>();
+        List<String> templateIds = Arrays.asList(id.split(","));
+        templateIds.forEach(item -> {
+            ids.add(Long.valueOf(item));
+        });
+
+        docService.delete(ids);
         return new CommonResp();
     }
 }

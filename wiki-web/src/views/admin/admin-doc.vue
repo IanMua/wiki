@@ -180,6 +180,23 @@ const setDisable = (treeSelectData: any, id: any) => {
   }
 }
 
+const ids: Array<string> = [];
+const getDeleteIds = (treeSelectData: any, id: any) => {
+  for (let i = 0; i < treeSelectData.length; i++) {
+    const node = treeSelectData[i];
+    if (node.id === id) {
+      ids.push(id);
+
+      const children = node.children;
+      if (Tool.isNotEmpty(children)) {
+        for (let j = 0; j < children.length; j++) {
+          getDeleteIds(children, children[j].id);
+        }
+      }
+    }
+  }
+}
+
 /**
  * 编辑
  */
@@ -209,7 +226,8 @@ const add = () => {
  * 删除
  */
 const handleDelete = (id: number) => {
-  axios.delete(`/doc/delete/${id}`).then(res => {
+  getDeleteIds(level1.value, id);
+  axios.delete("/doc/delete/" + ids.join(",")).then(res => {
     if (res.data.success) {
       handleQuery();
     }
