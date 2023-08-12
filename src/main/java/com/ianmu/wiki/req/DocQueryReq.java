@@ -8,6 +8,8 @@ import lombok.EqualsAndHashCode;
 public class DocQueryReq extends PageReq{
     private Long id;
 
+    private Long ebookId;
+
     private Long parent;
 
     private String name;

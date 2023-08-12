@@ -31,6 +31,9 @@ public class DocService {
         DocExample docExample = new DocExample();
         docExample.setOrderByClause("sort asc");
         DocExample.Criteria criteria = docExample.createCriteria();
+        if (!ObjectUtils.isEmpty(req.getEbookId())) {
+            criteria.andEbookIdEqualTo(req.getEbookId());
+        }
         if (!ObjectUtils.isEmpty(req.getName())) {
             criteria.andNameLike("%" + req.getName() + "%");
         }

@@ -158,7 +158,9 @@ const handleFormOk = () => {
       formLoading.value = false;
       formOpen.value = false;
 
-      handleQuery();
+      handleQuery({
+        ebookId: route.query.ebookId
+      });
     } else {
       formLoading.value = false;
     }
@@ -229,7 +231,9 @@ const handleDelete = (id: number) => {
   getDeleteIds(level1.value, id);
   axios.delete("/doc/delete/" + ids.join(",")).then(res => {
     if (res.data.success) {
-      handleQuery();
+      handleQuery({
+        ebookId: route.query.ebookId
+      });
     }
   });
 };
@@ -245,7 +249,8 @@ const handleSearchBookName = () => {
   }
   searching.value = true;
   handleQuery({
-    name: searchBookName.value
+    name: searchBookName.value,
+    ebookId: route.query.ebookId
   }).then(() => {
     searching.value = false;
   })
@@ -278,7 +283,9 @@ const handleQuery = (params?: any) => {
 }
 
 onMounted(() => {
-  handleQuery();
+  handleQuery({
+    ebookId: route.query.ebookId
+  });
 });
 
 </script>
