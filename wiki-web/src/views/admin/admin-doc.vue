@@ -118,11 +118,10 @@
 
 import {defineComponent, h, onMounted, reactive, ref} from "vue";
 import axios from "axios";
-import {notification, NotificationPlacement} from "ant-design-vue";
-import {CloseCircleFilled} from "@ant-design/icons-vue";
 import {Tool} from "@/util/tool";
 import {useRoute} from "vue-router";
 import Editor from "@tinymce/tinymce-vue";
+import tinymce from "tinymce";
 
 defineComponent({
   name: "AdminDoc"
@@ -167,7 +166,7 @@ const handleFormOk = () => {
   axios.post("/doc/save", {
     ...doc.value,
   }).then(res => {
-    if (res.data.success) {
+    if (res.data?.success) {
       formLoading.value = false;
       formOpen.value = false;
 
@@ -216,10 +215,12 @@ const getDeleteIds = (treeSelectData: any, id: any) => {
  * 富文本初始化
  */
 const content: any = ref();
+const assetsContent: any = ref();
 const apiKey = ref("60t8v3pn12b662p8h2qrolgh0sr9jdmjkxctsdur4dgonm9o");
 const init = reactive({
   language: "zh_CN", //语言类型
   placeholder: "在这里输入文字",
+  skin: "oxide",
   // min_width: 600,
   min_height: 600,
   // height: 600, //注：引入autoresize插件时，此属性失效
