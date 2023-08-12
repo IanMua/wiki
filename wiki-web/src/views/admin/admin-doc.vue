@@ -57,58 +57,59 @@
     </a-layout-content>
   </a-layout>
 
-  <a-modal v-model:open="formOpen" title="文档表单" :confirm-loading="formLoading" @ok="handleFormOk"
+  <a-modal v-model:open="formOpen" title="文档表单" :confirm-loading="formLoading" @ok="handleFormOk" ok-text="确认"
+           cancel-text="取消"
            :maskClosable="false" style="min-width: 50vw;">
-      <a-form
-          :model="doc"
-          name="basic"
-          :label-col="{ span: 4 }"
-          :wrapper-col="{ span: 16 }"
+    <a-form
+        :model="doc"
+        name="basic"
+        :label-col="{ span: 4 }"
+        :wrapper-col="{ span: 16 }"
+    >
+
+      <a-form-item
+          label="名称"
+          name="name"
+          :rules="[{ required: true, message: '请输入文档名称' }]"
       >
+        <a-input v-model:value="doc.name"/>
+      </a-form-item>
 
-        <a-form-item
-            label="名称"
-            name="name"
-            :rules="[{ required: true, message: '请输入文档名称' }]"
-        >
-          <a-input v-model:value="doc.name"/>
-        </a-form-item>
+      <a-form-item
+          label="父文档"
+          name="name"
+          :rules="[{ required: true, message: '请输入文档名称' }]"
+      >
+        <a-tree-select
+            v-model:value="doc.parent"
+            show-search
+            style="width: 100%"
+            :field-names="{label: 'name', value: 'id', children: 'children'}"
+            :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
+            placeholder="请选择父文档"
+            allow-clear
+            tree-default-expand-all
+            :tree-data="treeSelectData"
+            tree-node-filter-prop="label"
+        />
+      </a-form-item>
 
-        <a-form-item
-            label="父文档"
-            name="name"
-            :rules="[{ required: true, message: '请输入文档名称' }]"
-        >
-          <a-tree-select
-              v-model:value="doc.parent"
-              show-search
-              style="width: 100%"
-              :field-names="{label: 'name', value: 'id', children: 'children'}"
-              :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
-              placeholder="请选择父文档"
-              allow-clear
-              tree-default-expand-all
-              :tree-data="treeSelectData"
-              tree-node-filter-prop="label"
-          />
-        </a-form-item>
+      <a-form-item
+          label="顺序"
+          name="sort"
+          :rules="[{ required: true, message: '请输入排序号' }]"
+      >
+        <a-input v-model:value="doc.sort"/>
+      </a-form-item>
 
-        <a-form-item
-            label="顺序"
-            name="sort"
-            :rules="[{ required: true, message: '请输入排序号' }]"
-        >
-          <a-input v-model:value="doc.sort"/>
-        </a-form-item>
-
-        <a-form-item
-            label="内容"
-            name="content"
-            :rules="[{ required: true, message: '请输入内容' }]"
-        >
-          <Editor v-model="content" :api-key="apiKey" :init="init"/>
-        </a-form-item>
-      </a-form>
+      <a-form-item
+          label="内容"
+          name="content"
+          :rules="[{ required: true, message: '请输入内容' }]"
+      >
+        <Editor v-model="content" :api-key="apiKey" :init="init"/>
+      </a-form-item>
+    </a-form>
   </a-modal>
 </template>
 

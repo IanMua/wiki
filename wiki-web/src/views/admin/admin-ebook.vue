@@ -65,7 +65,8 @@
       </a-table>
     </a-layout-content>
   </a-layout>
-  <a-modal v-model:open="formOpen" title="电子书表单" :confirm-loading="formLoading" @ok="handleFormOk">
+  <a-modal v-model:open="formOpen" title="电子书表单" :confirm-loading="formLoading" @ok="handleFormOk" ok-text="确认"
+           cancel-text="取消">
     <a-form
         :model="ebook"
         name="basic"

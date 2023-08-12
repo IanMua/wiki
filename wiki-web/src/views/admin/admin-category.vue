@@ -56,7 +56,8 @@
       </a-table>
     </a-layout-content>
   </a-layout>
-  <a-modal v-model:open="formOpen" title="分类表单" :confirm-loading="formLoading" @ok="handleFormOk">
+  <a-modal v-model:open="formOpen" title="分类表单" :confirm-loading="formLoading" @ok="handleFormOk" ok-text="确认"
+           cancel-text="取消">
     <a-form
         :model="category"
         name="basic"
@@ -212,7 +213,7 @@ const level1 = ref();
 const handleQuery = (params?: any) => {
   return new Promise((resolve, reject) => {
     loading.value = true;
-    axios.get("/category/all",{
+    axios.get("/category/all", {
       params
     }).then(res => {
       loading.value = false;
