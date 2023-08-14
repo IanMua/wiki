@@ -3,6 +3,8 @@ package com.ianmu.wiki.service;
 import com.github.pagehelper.PageInfo;
 import com.ianmu.wiki.entity.WikiUser;
 import com.ianmu.wiki.entity.WikiUserExample;
+import com.ianmu.wiki.exception.BusinessException;
+import com.ianmu.wiki.exception.BusinessExceptionCode;
 import com.ianmu.wiki.mapper.WikiUserMapper;
 import com.ianmu.wiki.req.WikiUserQueryReq;
 import com.ianmu.wiki.req.WikiUserSaveReq;
@@ -13,6 +15,7 @@ import com.ianmu.wiki.utils.CopyUtil;
 import com.ianmu.wiki.utils.SnowFlow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
@@ -63,6 +66,12 @@ public class WikiUserService {
     public CommonResp save(WikiUserSaveReq req) {
         CommonResp commonResp = new CommonResp();
         if (ObjectUtils.isEmpty(req.getId())) {
+
+            WikiUser user = this.queryByLoginName(req.getLoginName());
+            if (!ObjectUtils.isEmpty(user)) {
+                throw new BusinessException(BusinessExceptionCode.USER_LOGIN_NAME_EXIST);
+            }
+
             req.setId(snowFlow.nextId());
             wikiUserMapper.insert(CopyUtil.copy(req, WikiUser.class));
         } else {
@@ -73,5 +82,17 @@ public class WikiUserService {
 
     public void delete(Long id) {
         wikiUserMapper.deleteByPrimaryKey(id);
+    }
+
+    public WikiUser queryByLoginName(String loginName) {
+        WikiUserExample wikiUserExample = new WikiUserExample();
+        WikiUserExample.Criteria criteria = wikiUserExample.createCriteria();
+        criteria.andLoginNameEqualTo(loginName);
+        List<WikiUser> userList = wikiUserMapper.selectByExample(wikiUserExample);
+        if (CollectionUtils.isEmpty(userList)) {
+            return null;
+        } else {
+            return userList.get(0);
+        }
     }
 }
