@@ -5,7 +5,7 @@
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="login_name" jdbcType="VARCHAR" property="loginName" />
     <result column="name" jdbcType="VARCHAR" property="name" />
-    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="password" jdbcType="CHAR" property="password" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -74,7 +74,7 @@
       distinct
     </if>
     <include refid="Base_Column_List" />
-    from wiki-user
+    from wiki_user
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -85,27 +85,27 @@
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    from wiki-user
+    from wiki_user
     where id = #{id,jdbcType=BIGINT}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-    delete from wiki-user
+    delete from wiki_user
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <delete id="deleteByExample" parameterType="com.ianmu.wiki.entity.WikiUserExample">
-    delete from wiki-user
+    delete from wiki_user
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
   <insert id="insert" parameterType="com.ianmu.wiki.entity.WikiUser">
-    insert into wiki-user (id, login_name, name, 
+    insert into wiki_user (id, login_name, name, 
       password)
     values (#{id,jdbcType=BIGINT}, #{loginName,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
-      #{password,jdbcType=VARCHAR})
+      #{password,jdbcType=CHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ianmu.wiki.entity.WikiUser">
-    insert into wiki-user
+    insert into wiki_user
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
         id,
@@ -131,18 +131,18 @@
         #{name,jdbcType=VARCHAR},
       </if>
       <if test="password != null">
-        #{password,jdbcType=VARCHAR},
+        #{password,jdbcType=CHAR},
       </if>
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.ianmu.wiki.entity.WikiUserExample" resultType="java.lang.Long">
-    select count(*) from wiki-user
+    select count(*) from wiki_user
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
   <update id="updateByExampleSelective" parameterType="map">
-    update wiki-user
+    update wiki_user
     <set>
       <if test="row.id != null">
         id = #{row.id,jdbcType=BIGINT},
@@ -154,7 +154,7 @@
         name = #{row.name,jdbcType=VARCHAR},
       </if>
       <if test="row.password != null">
-        password = #{row.password,jdbcType=VARCHAR},
+        password = #{row.password,jdbcType=CHAR},
       </if>
     </set>
     <if test="example != null">
@@ -162,17 +162,17 @@
     </if>
   </update>
   <update id="updateByExample" parameterType="map">
-    update wiki-user
+    update wiki_user
     set id = #{row.id,jdbcType=BIGINT},
       login_name = #{row.loginName,jdbcType=VARCHAR},
       name = #{row.name,jdbcType=VARCHAR},
-      password = #{row.password,jdbcType=VARCHAR}
+      password = #{row.password,jdbcType=CHAR}
     <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
   <update id="updateByPrimaryKeySelective" parameterType="com.ianmu.wiki.entity.WikiUser">
-    update wiki-user
+    update wiki_user
     <set>
       <if test="loginName != null">
         login_name = #{loginName,jdbcType=VARCHAR},
@@ -181,16 +181,16 @@
         name = #{name,jdbcType=VARCHAR},
       </if>
       <if test="password != null">
-        password = #{password,jdbcType=VARCHAR},
+        password = #{password,jdbcType=CHAR},
       </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ianmu.wiki.entity.WikiUser">
-    update wiki-user
+    update wiki_user
     set login_name = #{loginName,jdbcType=VARCHAR},
       name = #{name,jdbcType=VARCHAR},
-      password = #{password,jdbcType=VARCHAR}
+      password = #{password,jdbcType=CHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
 </mapper>
