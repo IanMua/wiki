@@ -75,7 +75,9 @@ public class WikiUserService {
             req.setId(snowFlow.nextId());
             wikiUserMapper.insert(CopyUtil.copy(req, WikiUser.class));
         } else {
-            wikiUserMapper.updateByPrimaryKey(CopyUtil.copy(req, WikiUser.class));
+            WikiUser user = CopyUtil.copy(req, WikiUser.class);
+            user.setLoginName(null);
+            wikiUserMapper.updateByPrimaryKeySelective(user);
         }
         return commonResp;
     }

@@ -5,20 +5,20 @@
     >
       <div style="margin-bottom: 10px">
         <a-space>
-<!--          <a-input-search v-model:value="searchBookName"-->
-<!--                          allow-clear-->
-<!--                          :loading="searching"-->
-<!--                          enter-button-->
-<!--                          placeholder="电子书名称"-->
-<!--                          @search="handleSearchBookName"-->
-<!--          >-->
-<!--            <template #prefix>-->
-<!--              <book-two-tone/>-->
-<!--            </template>-->
-<!--            <template #enter-button>-->
+          <!--          <a-input-search v-model:value="searchBookName"-->
+          <!--                          allow-clear-->
+          <!--                          :loading="searching"-->
+          <!--                          enter-button-->
+          <!--                          placeholder="电子书名称"-->
+          <!--                          @search="handleSearchBookName"-->
+          <!--          >-->
+          <!--            <template #prefix>-->
+          <!--              <book-two-tone/>-->
+          <!--            </template>-->
+          <!--            <template #enter-button>-->
 
-<!--            </template>-->
-<!--          </a-input-search>-->
+          <!--            </template>-->
+          <!--          </a-input-search>-->
           <a-button type="primary" @click="add">
             添加
           </a-button>
@@ -67,7 +67,7 @@
           name="loginName"
           :rules="[{ required: true, message: '请输入登录名'}]"
       >
-        <a-input v-model:value="user.loginName"/>
+        <a-input v-model:value="user.loginName" :disabled="!!user.id"/>
       </a-form-item>
 
       <a-form-item
@@ -94,9 +94,8 @@
 
 import {defineComponent, h, onMounted, ref} from "vue";
 import axios from "axios";
-import {notification, NotificationPlacement} from "ant-design-vue";
-import {CloseCircleFilled} from "@ant-design/icons-vue";
 import {Tool} from "@/util/tool";
+import {Md5} from "ts-md5"
 
 defineComponent({
   name: "AdminUser"
@@ -105,6 +104,8 @@ defineComponent({
 const users = ref();
 
 const loading = ref(true);
+
+const KEY = process.env.VUE_APP_KEY;
 
 const columns = [
   {
@@ -132,8 +133,11 @@ const user: any = ref();
 const formOpen = ref(false);
 const formLoading = ref(false);
 const handleFormOk = () => {
-
   formLoading.value = true;
+
+  user.value.password = Md5.hashStr(user.value.password + process.env.VUE_APP_KEY);
+  console.log(user.value.password)
+
   axios.post("/user/save", {
     ...user.value
   }).then(res => {
