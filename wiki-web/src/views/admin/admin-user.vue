@@ -82,6 +82,7 @@
           label="密码"
           name="password"
           :rules="[{ required: true, message: '请输入密码' }]"
+          v-if="!user.id"
       >
         <a-input v-model:value="user.password"/>
       </a-form-item>
