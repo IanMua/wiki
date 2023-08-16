@@ -7,6 +7,7 @@ import com.ianmu.wiki.exception.BusinessException;
 import com.ianmu.wiki.exception.BusinessExceptionCode;
 import com.ianmu.wiki.mapper.WikiUserMapper;
 import com.ianmu.wiki.req.WikiUserQueryReq;
+import com.ianmu.wiki.req.WikiUserResetPasswordReq;
 import com.ianmu.wiki.req.WikiUserSaveReq;
 import com.ianmu.wiki.resp.CommonResp;
 import com.ianmu.wiki.resp.PageResp;
@@ -98,5 +99,12 @@ public class WikiUserService {
         } else {
             return userList.get(0);
         }
+    }
+
+    public CommonResp resetPassword(WikiUserResetPasswordReq req) {
+        CommonResp commonResp = new CommonResp();
+        WikiUser user = CopyUtil.copy(req, WikiUser.class);
+        wikiUserMapper.updateByPrimaryKeySelective(user);
+        return commonResp;
     }
 }

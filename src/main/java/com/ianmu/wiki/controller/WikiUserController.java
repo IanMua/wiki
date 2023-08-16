@@ -1,6 +1,7 @@
 package com.ianmu.wiki.controller;
 
 import com.ianmu.wiki.req.WikiUserQueryReq;
+import com.ianmu.wiki.req.WikiUserResetPasswordReq;
 import com.ianmu.wiki.req.WikiUserSaveReq;
 import com.ianmu.wiki.resp.CommonResp;
 import com.ianmu.wiki.resp.WikiUserQueryResp;
@@ -49,5 +50,10 @@ public class WikiUserController {
     public CommonResp delete(@PathVariable Long id) {
         wikiUserService.delete(id);
         return new CommonResp();
+    }
+
+    @RequestMapping(value = "/reset/password", method = RequestMethod.POST)
+    public CommonResp resetPassword(@Valid @RequestBody WikiUserResetPasswordReq req) {
+        return wikiUserService.resetPassword(req);
     }
 }

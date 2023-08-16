@@ -38,6 +38,9 @@
               <a-button type="primary" @click="edit(record)">
                 编辑
               </a-button>
+              <a-button type="primary" @click="resetPassword(record)">
+                重置密码
+              </a-button>
               <a-popconfirm
                   title="删除后不可恢复，确认删除?"
                   ok-text="是"
@@ -83,6 +86,24 @@
           name="password"
           :rules="[{ required: true, message: '请输入密码' }]"
           v-if="!user.id"
+      >
+        <a-input v-model:value="user.password"/>
+      </a-form-item>
+    </a-form>
+  </a-modal>
+
+  <a-modal v-model:open="resetFormOpen" title="重置密码" :confirm-loading="resetFormLoading" @ok="handleResetFormOk" ok-text="确认"
+           cancel-text="取消">
+    <a-form
+        :model="user"
+        name="basic"
+        :label-col="{ span: 4 }"
+        :wrapper-col="{ span: 16 }"
+    >
+      <a-form-item
+          label="密码"
+          name="password"
+          :rules="[{ required: true, message: '请输入密码' }]"
       >
         <a-input v-model:value="user.password"/>
       </a-form-item>
@@ -157,11 +178,45 @@ const handleFormOk = () => {
 }
 
 /**
+ * 重置密码
+ */
+const resetFormOpen = ref();
+const resetFormLoading = ref();
+const handleResetFormOk = () => {
+  formLoading.value = true;
+  user.value.password = Md5.hashStr(user.value.password + process.env.VUE_APP_KEY);
+  axios.post("/user/reset/password", {
+    ...user.value
+  }).then(res => {
+    if (res.data.success) {
+      formLoading.value = false;
+      resetFormOpen.value = false;
+
+      handleQueryUser({
+        page: pagination.value.current,
+        size: pagination.value.pageSize
+      });
+    } else {
+      formLoading.value = false;
+    }
+  })
+}
+
+/**
  * 编辑
  */
 const edit = (record: any) => {
   formOpen.value = true;
   user.value = Tool.copy(record);
+}
+
+/**
+ * 重置密码
+ */
+const resetPassword = (record: any) => {
+  resetFormOpen.value = true;
+  user.value = Tool.copy(record);
+  user.value.password = "";
 }
 
 /**
