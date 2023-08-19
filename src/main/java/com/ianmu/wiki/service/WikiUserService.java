@@ -6,14 +6,18 @@ import com.ianmu.wiki.entity.WikiUserExample;
 import com.ianmu.wiki.exception.BusinessException;
 import com.ianmu.wiki.exception.BusinessExceptionCode;
 import com.ianmu.wiki.mapper.WikiUserMapper;
+import com.ianmu.wiki.req.UserLoginReq;
 import com.ianmu.wiki.req.WikiUserQueryReq;
 import com.ianmu.wiki.req.WikiUserResetPasswordReq;
 import com.ianmu.wiki.req.WikiUserSaveReq;
 import com.ianmu.wiki.resp.CommonResp;
 import com.ianmu.wiki.resp.PageResp;
+import com.ianmu.wiki.resp.UserLoginResp;
 import com.ianmu.wiki.resp.WikiUserQueryResp;
 import com.ianmu.wiki.utils.CopyUtil;
 import com.ianmu.wiki.utils.SnowFlow;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -23,6 +27,8 @@ import java.util.List;
 
 @Service
 public class WikiUserService {
+
+    private final Logger LOG = LoggerFactory.getLogger(WikiUserService.class);
 
     @Autowired
     private WikiUserMapper wikiUserMapper;
@@ -106,5 +112,20 @@ public class WikiUserService {
         WikiUser user = CopyUtil.copy(req, WikiUser.class);
         wikiUserMapper.updateByPrimaryKeySelective(user);
         return commonResp;
+    }
+
+    public UserLoginResp login(UserLoginReq req) {
+        WikiUser userDb = queryByLoginName(req.getLoginName());
+        if (ObjectUtils.isEmpty(userDb)) {
+            LOG.info("用户名不存在，{}", req.getLoginName());
+            throw new BusinessException(BusinessExceptionCode.LOGIN_USER_ERROR);
+        } else {
+            if (userDb.getPassword().equals(req.getPassword())) {
+                return CopyUtil.copy(userDb, UserLoginResp.class);
+            } else {
+                LOG.info("密码不正确，输入密码：{}，数据库密码：{}", req.getPassword(), userDb.getPassword());
+                throw new BusinessException(BusinessExceptionCode.LOGIN_USER_ERROR);
+            }
+        }
     }
 }

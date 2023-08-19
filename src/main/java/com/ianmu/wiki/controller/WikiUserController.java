@@ -1,9 +1,11 @@
 package com.ianmu.wiki.controller;
 
+import com.ianmu.wiki.req.UserLoginReq;
 import com.ianmu.wiki.req.WikiUserQueryReq;
 import com.ianmu.wiki.req.WikiUserResetPasswordReq;
 import com.ianmu.wiki.req.WikiUserSaveReq;
 import com.ianmu.wiki.resp.CommonResp;
+import com.ianmu.wiki.resp.UserLoginResp;
 import com.ianmu.wiki.resp.WikiUserQueryResp;
 import com.ianmu.wiki.resp.PageResp;
 import com.ianmu.wiki.service.WikiUserService;
@@ -11,6 +13,7 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -55,5 +58,14 @@ public class WikiUserController {
     @RequestMapping(value = "/reset/password", method = RequestMethod.POST)
     public CommonResp resetPassword(@Valid @RequestBody WikiUserResetPasswordReq req) {
         return wikiUserService.resetPassword(req);
+    }
+
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public CommonResp<UserLoginResp> login(@Valid @RequestBody UserLoginReq req) {
+        req.setPassword(DigestUtils.md5DigestAsHex(req.getPassword().getBytes()));
+        CommonResp<UserLoginResp> resp = new CommonResp<>();
+        UserLoginResp userLoginResp = wikiUserService.login(req);
+        resp.setContent(userLoginResp);
+        return resp;
     }
 }
