@@ -8,7 +8,7 @@ spring:
     redis:
       host: 124.70.161.210
       port: 6379
-      password: Ianmu0810..
+      password: Ianmu0810
 
 server:
   port: 8088
@@ -21,3 +21,7 @@ logging:
       ianmu:
         wiki:
           mapper: trace
+124:
+  70:
+    161:
+      210:
