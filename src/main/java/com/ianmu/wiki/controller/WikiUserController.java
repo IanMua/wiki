@@ -57,6 +57,7 @@ public class WikiUserController {
 
     @RequestMapping(value = "/reset/password", method = RequestMethod.POST)
     public CommonResp resetPassword(@Valid @RequestBody WikiUserResetPasswordReq req) {
+        req.setPassword(DigestUtils.md5DigestAsHex(req.getPassword().getBytes()));
         return wikiUserService.resetPassword(req);
     }
 
