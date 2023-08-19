@@ -231,7 +231,7 @@ const add = () => {
  * 删除
  */
 const handleDelete = (id: number) => {
-  axios.delete(`/ebook/delete/${id}`).then(res => {
+  axios.delete(`/user/delete/${id}`).then(res => {
     if (res.data.success) {
       handleQueryUser({
         page: pagination.value.current,
