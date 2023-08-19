@@ -9,14 +9,17 @@ import com.ianmu.wiki.resp.UserLoginResp;
 import com.ianmu.wiki.resp.WikiUserQueryResp;
 import com.ianmu.wiki.resp.PageResp;
 import com.ianmu.wiki.service.WikiUserService;
+import com.ianmu.wiki.utils.SnowFlow;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("user")
@@ -26,6 +29,12 @@ public class WikiUserController {
 
     @Autowired
     private WikiUserService wikiUserService;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    @Autowired
+    private SnowFlow snowFlow;
 
     @RequestMapping(value = "/all", method = RequestMethod.GET)
     public CommonResp<List<WikiUserQueryResp>> all(@ModelAttribute WikiUserQueryReq req) {
@@ -46,6 +55,7 @@ public class WikiUserController {
 
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     public CommonResp save(@Valid @RequestBody WikiUserSaveReq req) {
+        req.setPassword(DigestUtils.md5DigestAsHex(req.getPassword().getBytes()));
         return wikiUserService.save(req);
     }
 
@@ -66,6 +76,11 @@ public class WikiUserController {
         req.setPassword(DigestUtils.md5DigestAsHex(req.getPassword().getBytes()));
         CommonResp<UserLoginResp> resp = new CommonResp<>();
         UserLoginResp userLoginResp = wikiUserService.login(req);
+
+        Long token = snowFlow.nextId();
+        LOG.info("生成单点登录token: {}，放入redis中", token);
+        userLoginResp.setToken(token.toString());
+        redisTemplate.opsForValue().set(token, userLoginResp, 3600 * 24, TimeUnit.SECONDS);
         resp.setContent(userLoginResp);
         return resp;
     }

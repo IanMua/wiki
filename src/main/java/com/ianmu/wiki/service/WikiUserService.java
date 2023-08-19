@@ -28,7 +28,7 @@ import java.util.List;
 @Service
 public class WikiUserService {
 
-    private final Logger LOG = LoggerFactory.getLogger(WikiUserService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WikiUserService.class);
 
     @Autowired
     private WikiUserMapper wikiUserMapper;

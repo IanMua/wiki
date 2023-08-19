@@ -4,6 +4,12 @@ spring:
     username: wiki_dev
     password: Ianmu_wiki_dev
     driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      host: 124.70.161.210
+      port: 6379
+      password: Ianmu0810..
+
 server:
   port: 8088
 mybatis:
