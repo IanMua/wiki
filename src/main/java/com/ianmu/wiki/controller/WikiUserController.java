@@ -32,7 +32,7 @@ public class WikiUserController {
     private WikiUserService wikiUserService;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private RedisTemplate<String, String> redisTemplate;
 
     @Autowired
     private SnowFlow snowFlow;
@@ -81,7 +81,7 @@ public class WikiUserController {
         Long token = snowFlow.nextId();
         LOG.info("生成单点登录token: {}，放入redis中", token);
         userLoginResp.setToken(token.toString());
-        redisTemplate.opsForValue().set(token, JsonUtil.toJson(userLoginResp), 3600 * 24, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(token.toString(), JsonUtil.toJson(userLoginResp), 3600 * 24, TimeUnit.SECONDS);
         resp.setContent(userLoginResp);
         return resp;
     }
