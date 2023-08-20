@@ -9,6 +9,7 @@ import com.ianmu.wiki.resp.UserLoginResp;
 import com.ianmu.wiki.resp.WikiUserQueryResp;
 import com.ianmu.wiki.resp.PageResp;
 import com.ianmu.wiki.service.WikiUserService;
+import com.ianmu.wiki.utils.JsonUtil;
 import com.ianmu.wiki.utils.SnowFlow;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -80,7 +81,7 @@ public class WikiUserController {
         Long token = snowFlow.nextId();
         LOG.info("生成单点登录token: {}，放入redis中", token);
         userLoginResp.setToken(token.toString());
-        redisTemplate.opsForValue().set(token, userLoginResp, 3600 * 24, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(token, JsonUtil.toJson(userLoginResp), 3600 * 24, TimeUnit.SECONDS);
         resp.setContent(userLoginResp);
         return resp;
     }

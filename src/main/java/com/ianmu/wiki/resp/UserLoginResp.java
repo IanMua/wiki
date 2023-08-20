@@ -8,7 +8,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public class UserLoginResp implements Serializable {
+public class UserLoginResp {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
