@@ -85,4 +85,12 @@ public class WikiUserController {
         resp.setContent(userLoginResp);
         return resp;
     }
+
+    @RequestMapping(value = "/logout/{token}", method = RequestMethod.GET)
+    public CommonResp logout(@PathVariable String token) {
+        CommonResp resp = new CommonResp<>();
+        redisTemplate.delete(token);
+        LOG.info("从redis中删除token: {}", token);
+        return resp;
+    }
 }

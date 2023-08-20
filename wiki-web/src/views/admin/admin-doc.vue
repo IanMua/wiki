@@ -272,7 +272,11 @@ const add = () => {
   content.value = "";
 
   treeSelectData.value = Tool.copy(level1.value);
-  treeSelectData.value.unshift({id: 0, name: "无"});
+  if (treeSelectData.value === undefined) {
+    treeSelectData.value = [{id: 0, name: "无"}];
+  } else {
+    treeSelectData.value.unshift({id: 0, name: "无"});
+  }
 }
 
 /**

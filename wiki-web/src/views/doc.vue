@@ -55,6 +55,7 @@ const handleQueryDocTree = (params?: any) => {
       }
 
       docs.value = res.data.content;
+      console.log(docs);
       docTree.value = Tool.array2Tree(docs.value, 0);
 
       resolve(res);
@@ -98,6 +99,10 @@ onMounted(async () => {
     }
     docTreeLoading.value = false;
   });
+  console.log(docTree)
+  if (docTree.value.length === 0) {
+    return;
+  }
   let id: string = docTree.value[0].id
   await handleQueryDocContent(id).then((res: any) => {
     if (res.code !== undefined) {

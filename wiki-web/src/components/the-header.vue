@@ -61,14 +61,12 @@ const handleClickLoginButton = async () => {
   axios.post("/user/login", {
     ...loginFormSubmitData.value
   }).then(res => {
-    if (!res.data.success) {
+    if (!res?.data.success) {
       return;
     }
 
     //写入登录成功后的用户数据
-    user.value = res.data.content;
-    store.commit("setUser", user.value);
-    console.log("用户数据：", user);
+    store.commit("setUser", res.data.content);
 
     //关闭模态窗
     loginModelShow.value = false;
@@ -81,6 +79,24 @@ const handleClickLoginButton = async () => {
       description:
           `您好: ${user.value.name}, 欢迎回到云慕时空Wiki电子书`
     });
+  })
+}
+
+//退出登录
+const handleClickLogout = () => {
+  axios.get("user/logout/" + user.value.token).then(resp => {
+    if (!resp?.data.success) {
+      return;
+    }
+
+    //退出登录成功提示
+    notification["success"]({
+      message: '退出登录成功',
+      description:
+          `拜拜~ ${user.value.name}`
+    });
+
+    store.commit("setUser", {});
   })
 }
 
@@ -120,11 +136,25 @@ const rules = {
         <router-link to="/about">关于我们</router-link>
       </a-menu-item>
     </a-menu>
-    <div v-if="!user?.id" class="login-menu" @click="handleClickHeaderLogin">
-      <span>登录</span>
-    </div>
-    <div v-else class="login-menu" @click="handleClickHeaderLogin">
-      <span>您好: {{ user.name }}</span>
+    <div class="user-login">
+      <div v-if="!user?.id" class="login-menu" @click="handleClickHeaderLogin">
+        <span>登录</span>
+      </div>
+      <div v-else class="user-info">
+        <div class="login-menu" @click="handleClickHeaderLogin">
+          <span>您好: {{ user.name }}</span>
+        </div>
+        <a-popconfirm
+            v-if="user?.id"
+            title="是否确认退出登录?"
+            cancel-text="否"
+            @confirm="handleClickLogout"
+        >
+          <div class="login-menu">
+            <span>退出登录</span>
+          </div>
+        </a-popconfirm>
+      </div>
     </div>
     <a-modal
         v-model:open="loginModelShow"
@@ -171,6 +201,11 @@ const rules = {
 .header {
   display: flex;
   justify-content: space-between;
+
+  .user-info {
+    display: flex;
+    gap: 20px;
+  }
 
   .login-menu {
     color: #ffffff;
