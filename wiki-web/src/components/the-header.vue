@@ -4,6 +4,7 @@ import {defineComponent, ref} from "vue";
 import axios from "axios";
 import {Md5} from "ts-md5";
 import {notification} from "ant-design-vue";
+import store from "@/store";
 
 defineComponent({
   name: 'the-header'
@@ -66,10 +67,12 @@ const handleClickLoginButton = async () => {
 
     //写入登录成功后的用户数据
     user.value = res.data.content;
+    store.commit("setUser", user.value);
     console.log("用户数据：", user);
 
     //关闭模态窗
     loginModelShow.value = false;
+    //取消模态框确定按钮加载状态
     loginResult.value = false;
 
     //登录成功提示
