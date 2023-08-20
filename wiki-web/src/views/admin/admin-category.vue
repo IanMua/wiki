@@ -218,7 +218,7 @@ const handleQuery = (params?: any) => {
     }).then(res => {
       loading.value = false;
 
-      if (!res.data.success) {
+      if (!res?.data.success) {
         return;
       }
 
