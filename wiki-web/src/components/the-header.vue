@@ -9,6 +9,9 @@ defineComponent({
   name: 'the-header'
 })
 
+//登录成功后数据
+const user = ref();
+
 //登录模态框是否显示
 const loginModelShow = ref(false);
 //登录是否成功
@@ -30,6 +33,8 @@ const handleClickHeaderLogin = () => {
 }
 //点击表单登录按钮，发送登录请求
 const handleClickLoginButton = async () => {
+
+  //表单规则校验，不满足规则无法发起请求
   let ok = false;
   await loginFormRef.value.validate()
       .then(() => {
@@ -42,20 +47,36 @@ const handleClickLoginButton = async () => {
     return;
   }
 
+  //开始登录流程
+  loginResult.value = true;
+
+  //密码加密
   loginFormSubmitData.value = {
     loginName: loginFormData.value.loginName,
     password: Md5.hashStr(loginFormData.value.password + process.env.VUE_APP_KEY)
   }
+
+  //登录请求
   axios.post("/user/login", {
     ...loginFormSubmitData.value
   }).then(res => {
     if (!res.data.success) {
       return;
     }
+
+    //写入登录成功后的用户数据
+    user.value = res.data.content;
+    console.log("用户数据：", user);
+
+    //关闭模态窗
+    loginModelShow.value = false;
+    loginResult.value = false;
+
+    //登录成功提示
     notification["success"]({
       message: '登录成功',
       description:
-          '登录时间：' + new Date(),
+          `您好: ${user.value.name}, 欢迎回到云慕时空Wiki电子书`
     });
   })
 }
@@ -96,8 +117,11 @@ const rules = {
         <router-link to="/about">关于我们</router-link>
       </a-menu-item>
     </a-menu>
-    <div class="login-menu" @click="handleClickHeaderLogin">
+    <div v-if="!user?.id" class="login-menu" @click="handleClickHeaderLogin">
       <span>登录</span>
+    </div>
+    <div v-else class="login-menu" @click="handleClickHeaderLogin">
+      <span>您好: {{ user.name }}</span>
     </div>
     <a-modal
         v-model:open="loginModelShow"
