@@ -1,6 +1,6 @@
 <script setup>
 
-import {defineComponent, ref} from "vue";
+import {computed, defineComponent, ref} from "vue";
 import axios from "axios";
 import {Md5} from "ts-md5";
 import {notification} from "ant-design-vue";
@@ -11,7 +11,7 @@ defineComponent({
 })
 
 //登录成功后数据
-const user = ref();
+const user = computed(() => store.state.user)
 
 //登录模态框是否显示
 const loginModelShow = ref(false);

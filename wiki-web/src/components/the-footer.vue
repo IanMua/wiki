@@ -1,12 +1,9 @@
 <script setup lang="ts">
-import {computed, defineComponent} from "vue";
-import store from "@/store";
+import {defineComponent} from "vue";
 
 defineComponent({
   name: "the-footer"
 })
-
-const user = computed(() => store.state.user)
 </script>
 
 <template>
