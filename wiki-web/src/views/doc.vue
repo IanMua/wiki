@@ -50,7 +50,7 @@ const handleQueryDocTree = (params?: any) => {
     axios.get("/doc/all", {
       params
     }).then((res: any) => {
-      if (!res.data?.success) {
+      if (!res?.data?.success) {
         resolve(res);
       }
 
@@ -75,7 +75,7 @@ const handleQueryDocContent = (id: string) => {
       resolve({code: 400, msg: "请求超时"});
     }, 10000);
     axios.get("/doc/query-content/" + id).then((res: any) => {
-      if (!res.data?.success) {
+      if (!res?.data?.success) {
         resolve(res);
       }
 
